@@ -1,0 +1,23 @@
+{
+  "name": "m2q3",
+  "version": "1.0.0",
+  "description": "Submission for Module 2 Quiz 3 in Game Programming 1 | Simple Side-Scroller",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/giran03/M2Q3.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/giran03/M2Q3/issues"
+  },
+  "homepage": "https://github.com/giran03/M2Q3#readme",
+  "dependencies": {
+    "phaser": "^3.60.0"
+  }
+}
