@@ -28,6 +28,13 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // player attributes
         this.attackRange = 25   //default: 25
 
+        // ENEMIES
+        this.Shrimp_Group
+        this.Comet_Group
+        this.Chicken_Group
+        this.Ghost_Group
+        this.GigaDuck_Group
+
         // CONTROLS
         this.controls
         this.keyW
@@ -39,6 +46,8 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // MISC
         this.screenCenterX
         this.screenCenterY
+        this.randomizer
+        this.randY
         this.portal
 
         // POWER UPS
@@ -89,10 +98,63 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.portalAnim()
 
         // 🫧 PLAYER 🫧
-        this.player = this.physics.add.sprite(33, 100, 'guraNormalIdle') // default 33, 100 | beside moving platform: 421, 751 | 1446, 590 | 690, 78
+        this.player = this.physics.add.sprite(47*16, 26*16, 'guraNormalIdle') // default 33, 100
         .play('guraNormalIdleAnim', true).setScale(.2)
         this.player.preFX.addGlow(0x8af1ff, 2)
         this.playerAttackGroup = this.physics.add.staticGroup()
+
+
+        // ENEMIES
+            // shrimp
+        this.Shrimp_Group = this.physics.add.group()
+        const shrimp_1 = this.Shrimp_Group.create(20*16 ,19.1*16, 'Dark_Shrimp')
+        this.tweenAnim_Handler(shrimp_1, 27*16, this, 3000)
+        const shrimp_2 = this.Shrimp_Group.create(24*16, 24.1*16, 'Dark_Shrimp').setFlipX(true)
+        this.tweenAnim_Handler(shrimp_2, 16*16, this, 2500)
+        const shrimp_3 = this.Shrimp_Group.create(41*16, 32.1*16, 'Dark_Shrimp')
+        this.tweenAnim_Handler(shrimp_3, 55*16, this, 3500)
+        this.Shrimp_Group.children.iterate((shrimp)=>{
+            shrimp.play('shrimpAnim', true)
+        })
+            // comet
+        this.Comet_Group = this.physics.add.group()
+        const comet_1 =  this.Comet_Group.create(2*16, 28.5*16, 'comet')
+        this.tweenAnim_Handler(comet_1, 9*16, this, 3000, 'Back.easeOut')
+        const comet_2 =  this.Comet_Group.create(55*16, 31.5*16, 'comet')
+        this.tweenAnim_Handler(comet_2, 62*16, this, 3000, 'Back.easeOut')
+        const comet_3 =  this.Comet_Group.create(14*16, 46.5*16, 'comet')
+        this.tweenAnim_Handler(comet_3, 47*16, this, 3000, 'Circ.easeInOut')
+        this.Comet_Group.children.iterate((comet)=>{
+            comet.play('cometAnim', true)
+            .disableBody(false)
+        })
+            // chicken
+        this.Chicken_Group = this.physics.add.group()
+        this.time.addEvent({
+            delay: 5000,
+            loop: true,
+            callback: ()=>{
+                this.spawnChicken()
+            }
+        })
+
+            // ghost
+        this.Ghost_Group = this.physics.add.group()
+        const ghost_1 =  this.Ghost_Group.create(64*16, 10*16, 'ghost')
+        this.tweenAnim_Handler(ghost_1, 99*16, this, 3000, 'Power2')
+        const ghost_2 =  this.Ghost_Group.create(95*16, 5*16, 'ghost').setFlipX(true)
+        this.tweenAnim_Handler(ghost_2, 68*16, this, 3000, 'Back.easeInOut')
+        this.Ghost_Group.children.iterate((ghost)=>{
+            ghost.play('ghostAnim', true)
+            .disableBody(false)
+        })
+            // gigaduck
+        this.GigaDuck_Group = this.physics.add.group()
+        const gigaDuck_1 =  this.GigaDuck_Group.create(106*16, 41.3*16, 'gigaDuck')
+        this.tweenAnim_Handler(gigaDuck_1, 121.5*16, this, 3000, 'Circ.easeInOut')
+        this.GigaDuck_Group.children.iterate((gigaDuck)=>{
+            gigaDuck.play('gigaDuckAnim', true)
+        })
 
         // BARREL
         this.barrelGroup = this.physics.add.group()
@@ -107,12 +169,12 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // MOVING PLATFORM
         this.movingPlatformGroup = this.physics.add.group()
         this.movingPlatform_1 = this.movingPlatformGroup.create(560, 687, 'movingPlatform')
-        this.movingPlatform_2 = this.movingPlatformGroup.create(1960, 700, 'movingPlatform')
+        // this.movingPlatform_2 = this.movingPlatformGroup.create(1960, 700, 'movingPlatform')
         this.movingPlatform_3 = this.movingPlatformGroup.create(1690, 500, 'movingPlatform').setScale(.5)
         this.movingPlatform_4 = this.movingPlatformGroup.create(113*16, 14*16, 'movingPlatform')
 
             // moving platform animation
-        this.tweenAnim_Handler(this.movingPlatform_2, 1960, 455, 2500)
+        // this.tweenAnim_Handler(this.movingPlatform_2, 1960, 455, 2500)
         this.tweenAnim_Handler(this.movingPlatform_3, 1690, 340, 1500)
         this.tweenAnim_Handler(this.movingPlatform_4, 113*16, 6.5*16, 1500)
 
@@ -122,13 +184,20 @@ export default class GameSceneLevel1 extends Phaser.Scene
         })    
 
         // 📦 COLLISIONS 📦
+            // player
         this.physics.add.collider(this.player, this.terrainTiles)
         this.physics.add.collider(this.player, this.breakableTiles)
         this.physics.add.collider(this.player, this.invisibleTiles)
+            // moving platform
         this.physics.add.collider(this.movingPlatformGroup, this.terrainTiles)
         this.physics.add.collider(this.barrelGroup, this.terrainTiles)
+            //power-ups
         this.physics.add.collider(this.trident, this.breakableTiles)
         this.physics.add.collider(this.trident, this.terrainTiles)
+            // enemies
+        this.physics.add.collider(this.Shrimp_Group, this.terrainTiles)
+        this.physics.add.collider(this.Comet_Group, this.terrainTiles)
+        this.physics.add.collider(this.GigaDuck_Group, this.terrainTiles)
 
         this.physics.add.collider(this.player, this.movingPlatformGroup, this.movingPlatformGroup_Handler, null, this)
         this.physics.add.overlap(this.player, this.trident, this.powerUp_Handler, null, this)
@@ -161,6 +230,9 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.cameras.main.startFollow(this.player, true)
         this.playerControls()
         this.playerBounds()
+        this.chickenBounds()
+        this.randomizer = Phaser.Math.Between(0, 1)
+        this.randY = Phaser.Math.Between(10, this.tileMap.heightInPixels - 50)
     }
 
     // ========================================================= 🌀 FUNCTIONS 🌀 =========================================================
@@ -184,21 +256,35 @@ export default class GameSceneLevel1 extends Phaser.Scene
     }
     playerAttack() {
         let playerAttack
+        let playerAttack2
         let attackAnimation_to_play = 'playerAttackAnim'
         if(this.attackUprade) {
             attackAnimation_to_play = 'playerAttackAnim_upgrade'
+            this.attackRange = 40
         }
-
-        if(this.player.flipX) { // this condition is to check wether the player is flipped
+        if(this.player.flipX) { // this condition is to check whether the player is flipped
             playerAttack = this.playerAttackGroup.create(this.player.x - this.attackRange, this.player.y, 'playerAttack')
             .refreshBody().anims.play(attackAnimation_to_play, true).setFlipX(true)
+            if(this.attackUprade) { 
+                playerAttack.setScale(1.3) 
+                playerAttack2 = this.playerAttackGroup.create(this.player.x + this.attackRange, this.player.y, 'playerAttack')
+                .refreshBody().anims.play(attackAnimation_to_play, true)
+                if(this.attackUprade) { playerAttack2.setScale(1.3) }
+            }
         } else {
             playerAttack = this.playerAttackGroup.create(this.player.x + this.attackRange, this.player.y, 'playerAttack')
             .refreshBody().anims.play(attackAnimation_to_play, true)
+            if(this.attackUprade) { 
+                playerAttack.setScale(1.3)
+                playerAttack2 = this.playerAttackGroup.create(this.player.x - this.attackRange, this.player.y, 'playerAttack')
+                .refreshBody().anims.play(attackAnimation_to_play, true).setFlipX(true)
+                if(this.attackUprade) { playerAttack2.setScale(1.3) } 
+            }
         }
         playerAttack.flipY = Math.random() >= 0.5   // random flip for attack animation 
         setTimeout(()=>{
             playerAttack.destroy()
+            if(this.attackUprade) { playerAttack2.destroy() }
         }, 300);
     }
 
@@ -206,6 +292,45 @@ export default class GameSceneLevel1 extends Phaser.Scene
         if (this.player.y >= 900) {
             this.player.enableBody(true, 33, 100, true, true)
         }
+    }
+    spawnChicken() {
+        if(this.randomizer == 0) {
+            const rightChicken = this.Chicken_Group.createMultiple({
+                key: 'chicken',
+                repeat: 5,
+                setXY: {
+                    x: this.tileMap.widthInPixels + 20,
+                    y: this.randY,
+                    stepX: Phaser.Math.Between(5, 10),
+                    stepY: 40
+                }
+            })
+            this.tweenAnim_Handler(rightChicken, -150, this, 8000, 'linear', false, false)
+        } else {
+            const leftChicken = this.Chicken_Group.createMultiple({
+                key: 'chicken',
+                repeat: 5,
+                setXY: {
+                    x: -20,
+                    y: this.randY,
+                    stepX: Phaser.Math.Between(5, 10),
+                    stepY: 40
+                }
+            })
+            this.tweenAnim_Handler(leftChicken, this.tileMap.widthInPixels + 150, this, 8000, 'linear', false, false)
+        }
+        this.Chicken_Group.children.iterate((chicken)=>{
+            chicken.play('chickenAnim', true)
+            .disableBody(false)
+        })
+    }
+    chickenBounds() {
+        this.Chicken_Group.children.iterate((chicken)=>{
+            if(chicken && (chicken.x <= -100 || chicken.x > this.tileMap.widthInPixels+100)) {
+                console.log('CHICKEN REMOVED!')
+                this.removeGroupChild(this.Chicken_Group, chicken)
+            }
+        })
     }
 
     powerUp_Handler(player, powerUp) {
@@ -229,9 +354,11 @@ export default class GameSceneLevel1 extends Phaser.Scene
             tile.hitCount = tile.hitCount || 0;
             tile.hitCount++;
                 // ~15 per hit; ~30 = 2 hits
-            if (tile.hitCount == 15) { tile.tint = 0xb36532 }
-            else if (tile.hitCount == 30) {
-                this.breakableTiles.removeTileAt(tile.x, tile.y)
+            if(this.attackUprade) {
+                if (tile.hitCount >= 15) { this.breakableTiles.removeTileAt(tile.x, tile.y) }
+            } else {
+                if (tile.hitCount == 15) { tile.tint = 0xb36532 }
+                else if (tile.hitCount == 30) { this.breakableTiles.removeTileAt(tile.x, tile.y) }
             }
         }
         if(sandstoneRocks.includes(tile.index) && this.attackUprade) {
@@ -371,20 +498,41 @@ export default class GameSceneLevel1 extends Phaser.Scene
     }
 
     removeGroupChild(group, child) {
-        console.log("barrelRemove")
         group.remove(child, true, true)
         child.destroy()
     }
-    tweenAnim_Handler(target, x, y, duration) {
-        this.tweens.add({ 
+    tweenAnim_Handler(target, x, y, duration, ease='Linear', yoyo='true', animateFlip='true') {
+        const tween = this.tweens.add({ 
             targets: target,
             x: x,
             y: y,
             duration: duration,
-            ease: 'linear',
+            ease: ease,
             repeat: -1,
-            yoyo: true
+            yoyo: yoyo
         })
+        if (animateFlip) {
+            this.time.addEvent({
+                delay: duration,
+                loop: true,
+                callback:()=>{
+                    if(target.flipX) {
+                        target.setFlipX(false)
+                        this.time.delayedCall(duration,()=>{
+                            target.setFlipX(true)
+                        })
+                    }
+                    else {
+                        target.setFlipX(true)
+                        this.time.delayedCall(duration,()=>{
+                            target.setFlipX(false)
+                        })
+                    }
+                }
+            })
+        }
+        tween.play()
+        return tween
     }
     
     // portal animation
