@@ -525,6 +525,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         if(chestIndex.includes(tile.index)) {
             if(this.keyE.isDown) {
                 this.playerScore += 50
+                this.interactableTiles.removeTileAt(tile.x-1, tile.y)
                 this.interactableTiles.removeTileAt(tile.x, tile.y)
                 this.interactableTiles.removeTileAt(tile.x+1, tile.y)
             }

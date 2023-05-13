@@ -53,7 +53,7 @@ export default class OverlaySceneLevel4 extends Phaser.Scene
             fontFamily: 'stackedPixel'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
 
-        const levelText = this.add.text(this.screenCenterX*.57, this.screenCenterY*.05, 'Level: 4 ', {
+        const levelText = this.add.text(this.screenCenterX*.6, this.screenCenterY*.05, 'Level: 4 ', {
             fontSize: '20px', 
             fill: '#ffe863' , 
             fontFamily: 'stackedPixel'

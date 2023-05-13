@@ -53,13 +53,13 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
             fontFamily: 'stackedPixel'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
 
-        const levelText = this.add.text(this.screenCenterX*.57, this.screenCenterY*.05, 'Level: 1 ', {
+        const levelText = this.add.text(this.screenCenterX*.6, this.screenCenterY*.05, 'Level: 1 ', {
             fontSize: '20px', 
             fill: '#ffe863' , 
             fontFamily: 'stackedPixel'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
 
-        const timeText = this.add.text(this.screenCenterX*.18, this.screenCenterY*.15, 'Time survived: 0', {
+        const timeText = this.add.text(this.screenCenterX*.18, this.screenCenterY*.15, 'Time survived: 0 ', {
             fontSize: '20px', 
             fill: '#ffe863' , 
             fontFamily: 'stackedPixel'
@@ -70,7 +70,7 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
             loop: true,
             callback: () => {
                 const currentTimeInSeconds = Math.floor(this.time.now / 1000);
-                timeText.setText(`Time survived: ${currentTimeInSeconds}`);
+                timeText.setText(`Time survived: ${currentTimeInSeconds} `);
             }
         })
 
