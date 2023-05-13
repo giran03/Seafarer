@@ -1,9 +1,9 @@
-export default class OverlaySceneLevel1 extends Phaser.Scene
+export default class OverlaySceneLevel2 extends Phaser.Scene
 {
     constructor() { 
-        super('OverlaySceneLevel1')
+        super('OverlaySceneLevel2')
 
-        this.GameScene = 'GameSceneLevel1'
+        this.GameScene = 'GameSceneLevel2'
         
         // UI
         this.scoreText
@@ -53,7 +53,7 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
             fontFamily: 'stackedPixel'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
 
-        const levelText = this.add.text(this.screenCenterX*.57, this.screenCenterY*.05, 'Level: 1 ', {
+        const levelText = this.add.text(this.screenCenterX*.57, this.screenCenterY*.05, 'Level: 2 ', {
             fontSize: '20px', 
             fill: '#ffe863' , 
             fontFamily: 'stackedPixel'
@@ -81,32 +81,6 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
                 fontFamily: 'stackedPixel'
             }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
         }
-        
-        // INTRO TEXT
-        // const introText = this.add.text(-1000, screenCenterY*.4,
-        //     "T H E  H U N T  S T A R T S  N O W 😶‍🌫️",
-        //     { 
-        //         fill: '#ffd129' , fontSize: '30px', fontFamily: 'stackedPixel'
-        //     }).setOrigin(.5).setShadow(2, 2, '#000', 5, true, true)
-        // this.tweens.add({
-        //     targets: introText,
-        //     delay: 700,
-        //     x: screenCenterX,
-        //     y: screenCenterY*.4,
-        //     duration: 1000,
-        //     ease: 'Expo.easeInOut'
-        // })
-        // this.time.delayedCall(2500,()=>{
-        //     this.tweens.add({
-        //         targets: introText,
-        //         delay: 700,
-        //         x: 1500,
-        //         y: screenCenterY*.4,
-        //         duration: 1000,
-        //         ease: 'Circ.easeInOut'
-        //     })
-        // })
-        
     }
 
     update() {

@@ -13,6 +13,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.tileMap
         this.tileSet
         this.terrainTiles
+        this.coinTiles
         this.breakableTiles
         this.interactableTiles
         this.invisibleTiles
@@ -26,7 +27,9 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.playerAttackGroup
 
         // player attributes
-        this.attackRange = 25   //default: 25
+        this.attackRange
+        this.playerHP
+        this.playerScore
 
         // ENEMIES
         this.Shrimp_Group
@@ -44,6 +47,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.keyQ
 
         // MISC
+        this.overlayScene = 'OverlaySceneLevel1'
         this.screenCenterX
         this.screenCenterY
         this.randomizer
@@ -75,6 +79,10 @@ export default class GameSceneLevel1 extends Phaser.Scene
 
     create() {
         console.log('⚠️ GAME SCENE LEVEL 1 START ⚠️')
+        // set attributes
+        this.attackRange = 25           //default: 25
+        this.playerHP = 100             //default: 100
+        this.playerScore = 0            //default: 0
 
         // get the center of the screen
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
@@ -89,6 +97,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.backgroundTop = this.tileMap.createLayer('backgroundTop', this.tileSet).setCollisionByExclusion([-1])    
             // other maps
         this.terrainTiles = this.tileMap.createLayer('terrain', this.tileSet).setCollisionByExclusion([-1])
+        this.coinTiles = this.tileMap.createLayer('coinTiles', this.tileSet).setCollisionByExclusion([-1])
         this.interactableTiles = this.tileMap.createLayer('interactableTiles', this.tileSet).setCollisionByExclusion([-1])
         this.breakableTiles = this.tileMap.createLayer('breakableTiles', this.tileSet).setCollisionByExclusion([-1])
         this.invisibleTiles = this.tileMap.createLayer('invisibleTiles', this.tileSet).setCollisionByExclusion([-1]).setVisible(false)
@@ -98,11 +107,10 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.portalAnim()
 
         // 🫧 PLAYER 🫧
-        this.player = this.physics.add.sprite(47*16, 26*16, 'guraNormalIdle') // default 33, 100
+        this.player = this.physics.add.sprite(33, 100, 'guraNormalIdle') // default 33, 100
         .play('guraNormalIdleAnim', true).setScale(.2)
         this.player.preFX.addGlow(0x8af1ff, 2)
         this.playerAttackGroup = this.physics.add.staticGroup()
-
 
         // ENEMIES
             // shrimp
@@ -115,6 +123,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.tweenAnim_Handler(shrimp_3, 55*16, this, 3500)
         this.Shrimp_Group.children.iterate((shrimp)=>{
             shrimp.play('shrimpAnim', true)
+            shrimp.body.allowGravity = false
         })
             // comet
         this.Comet_Group = this.physics.add.group()
@@ -124,9 +133,11 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.tweenAnim_Handler(comet_2, 62*16, this, 3000, 'Back.easeOut')
         const comet_3 =  this.Comet_Group.create(14*16, 46.5*16, 'comet')
         this.tweenAnim_Handler(comet_3, 47*16, this, 3000, 'Circ.easeInOut')
+        const comet_4 =  this.Comet_Group.create(103*16, 14.5*16, 'comet')
+        this.tweenAnim_Handler(comet_4, 118*16, this, 3500, 'Circ.easeInOut')
         this.Comet_Group.children.iterate((comet)=>{
             comet.play('cometAnim', true)
-            .disableBody(false)
+            comet.body.allowGravity = false
         })
             // chicken
         this.Chicken_Group = this.physics.add.group()
@@ -137,23 +148,27 @@ export default class GameSceneLevel1 extends Phaser.Scene
                 this.spawnChicken()
             }
         })
-
             // ghost
         this.Ghost_Group = this.physics.add.group()
         const ghost_1 =  this.Ghost_Group.create(64*16, 10*16, 'ghost')
         this.tweenAnim_Handler(ghost_1, 99*16, this, 3000, 'Power2')
         const ghost_2 =  this.Ghost_Group.create(95*16, 5*16, 'ghost').setFlipX(true)
-        this.tweenAnim_Handler(ghost_2, 68*16, this, 3000, 'Back.easeInOut')
+        this.tweenAnim_Handler(ghost_2, 68*16, this, 4500, 'Back.easeInOut')
+        const ghost_3 =  this.Ghost_Group.create(122*16, 9*16, 'ghost').setFlipX(true)
+        this.tweenAnim_Handler(ghost_3, 107*16, this, 4000, 'Back.easeInOut')
+        const ghost_4 =  this.Ghost_Group.create(41*16, 26*16, 'ghost')
+        this.tweenAnim_Handler(ghost_4, 68*16, this, 3500, 'Circ.easeInOut')
         this.Ghost_Group.children.iterate((ghost)=>{
             ghost.play('ghostAnim', true)
-            .disableBody(false)
+            ghost.body.allowGravity = false
         })
             // gigaduck
         this.GigaDuck_Group = this.physics.add.group()
-        const gigaDuck_1 =  this.GigaDuck_Group.create(106*16, 41.3*16, 'gigaDuck')
+        const gigaDuck_1 =  this.GigaDuck_Group.create(107*16, 41.3*16, 'gigaDuck')
         this.tweenAnim_Handler(gigaDuck_1, 121.5*16, this, 3000, 'Circ.easeInOut')
         this.GigaDuck_Group.children.iterate((gigaDuck)=>{
             gigaDuck.play('gigaDuckAnim', true)
+            gigaDuck.body.allowGravity = false
         })
 
         // BARREL
@@ -165,16 +180,16 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // POWER-UPS
         this.trident = this.physics.add.sprite(1097, 110, 'trident')
 
-
         // MOVING PLATFORM
         this.movingPlatformGroup = this.physics.add.group()
         this.movingPlatform_1 = this.movingPlatformGroup.create(560, 687, 'movingPlatform')
-        // this.movingPlatform_2 = this.movingPlatformGroup.create(1960, 700, 'movingPlatform')
+        this.movingPlatform_2 = this.movingPlatformGroup.create(1960, 700, 'movingPlatform').setVisible(false)
         this.movingPlatform_3 = this.movingPlatformGroup.create(1690, 500, 'movingPlatform').setScale(.5)
         this.movingPlatform_4 = this.movingPlatformGroup.create(113*16, 14*16, 'movingPlatform')
+        
 
             // moving platform animation
-        // this.tweenAnim_Handler(this.movingPlatform_2, 1960, 455, 2500)
+        this.tweenAnim_Handler(this.movingPlatform_2, 1960, 455, 2500)
         this.tweenAnim_Handler(this.movingPlatform_3, 1690, 340, 1500)
         this.tweenAnim_Handler(this.movingPlatform_4, 113*16, 6.5*16, 1500)
 
@@ -188,22 +203,32 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.physics.add.collider(this.player, this.terrainTiles)
         this.physics.add.collider(this.player, this.breakableTiles)
         this.physics.add.collider(this.player, this.invisibleTiles)
-            // moving platform
-        this.physics.add.collider(this.movingPlatformGroup, this.terrainTiles)
-        this.physics.add.collider(this.barrelGroup, this.terrainTiles)
             //power-ups
         this.physics.add.collider(this.trident, this.breakableTiles)
         this.physics.add.collider(this.trident, this.terrainTiles)
-            // enemies
-        this.physics.add.collider(this.Shrimp_Group, this.terrainTiles)
-        this.physics.add.collider(this.Comet_Group, this.terrainTiles)
-        this.physics.add.collider(this.GigaDuck_Group, this.terrainTiles)
+            // moving platform
+        this.physics.add.collider(this.movingPlatformGroup, this.terrainTiles)
+        this.physics.add.collider(this.barrelGroup, this.terrainTiles)
 
+            // player + enemy
+        this.physics.add.overlap(this.player, this.Shrimp_Group, this.enemyDamage_Handler, null, this)
+        this.physics.add.overlap(this.player, this.Comet_Group, this.enemyDamage_Handler, null, this)
+        this.physics.add.overlap(this.player, this.Chicken_Group, this.enemyDamage_Handler, null, this)
+        this.physics.add.overlap(this.player, this.Ghost_Group, this.enemyDamage_Handler, null, this)
+        this.physics.add.overlap(this.player, this.GigaDuck_Group, this.enemyDamage_Handler, null, this)
+            // misc
         this.physics.add.collider(this.player, this.movingPlatformGroup, this.movingPlatformGroup_Handler, null, this)
+        this.physics.add.overlap(this.player, this.coinTiles, this.coin_Handler, null, this)
         this.physics.add.overlap(this.player, this.trident, this.powerUp_Handler, null, this)
         this.physics.add.overlap(this.player, this.barrelGroup, this.barrelCollection_Handler, null, this)
-        this.physics.add.overlap(this.playerAttackGroup, this.breakableTiles, this.tilesBreak_Handler, null, this)
         this.physics.add.overlap(this.player, this.interactableTiles, this.interactableTiles_Handler, null, this)
+        this.physics.add.overlap(this.playerAttackGroup, this.breakableTiles, this.tilesBreak_Handler, null, this)
+        
+        this.physics.add.overlap(this.playerAttackGroup, this.Shrimp_Group, this.enemyHP_Handler, null, this)
+        this.physics.add.overlap(this.playerAttackGroup, this.Comet_Group, this.enemyHP_Handler, null, this)
+        this.physics.add.overlap(this.playerAttackGroup, this.Chicken_Group, this.enemyHP_Handler, null, this)
+        this.physics.add.overlap(this.playerAttackGroup, this.Ghost_Group, this.enemyHP_Handler, null, this)
+        this.physics.add.overlap(this.playerAttackGroup, this.GigaDuck_Group, this.enemyHP_Handler, null, this)
 
         // TEXT
         this.questionMarkText_Handler()
@@ -219,11 +244,15 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
         this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q)
         this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
-
+            // quickly get player pos, used for debugging
         this.input.on('pointerdown', ()=> {
             console.log('Player X: ' + Math.floor(this.player.x) + 
                     '\t\tPlayer Y: ' + Math.floor(this.player.y))
         })
+        
+        // OVERLAY SCENE
+        this.scene.launch(this.overlayScene) 
+        this.scene.bringToTop(this.overlayScene)
     }
 
     update() {
@@ -231,11 +260,14 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.playerControls()
         this.playerBounds()
         this.chickenBounds()
+        this.data.set('playerHP', this.playerHP)
+        this.data.set('playerScore', this.playerScore)
         this.randomizer = Phaser.Math.Between(0, 1)
         this.randY = Phaser.Math.Between(10, this.tileMap.heightInPixels - 50)
     }
 
     // ========================================================= 🌀 FUNCTIONS 🌀 =========================================================
+        // PLAYER
     playerControls() {
         // ⌨️ PLAYER CONTROLS ⌨️
         if (this.controls.right.isUp && this.controls.left.isUp && this.keyA.isUp && this.keyD.isUp ) {
@@ -287,11 +319,59 @@ export default class GameSceneLevel1 extends Phaser.Scene
             if(this.attackUprade) { playerAttack2.destroy() }
         }, 300);
     }
-
     playerBounds() {
         if (this.player.y >= 900) {
             this.player.enableBody(true, 33, 100, true, true)
         }
+    }
+
+        // ENEMIES
+    enemyDamage_Handler(player, enemy) {
+        enemy.hitCount = enemy.hitCount || 0
+        enemy.hitCount++
+        if(enemy.hitCount % 6 == 0) {
+            if(this.Shrimp_Group.contains(enemy)) {
+                this.playerHP -= 4
+            }if(this.Comet_Group.contains(enemy)) {
+                this.playerHP -= 4
+            }if(this.Chicken_Group.contains(enemy)) {
+                this.playerHP -= 2
+            }if(this.Ghost_Group.contains(enemy)) {
+                this.playerHP -= 6
+            }if(this.GigaDuck_Group.contains(enemy)) {
+                this.playerHP -= 8
+            } this.damagedAnim(this.player)
+        }
+    }
+    enemyHP_Handler(playerAttack, enemy) {
+        enemy.hitCount = enemy.hitCount || 0
+        enemy.hitCount++
+        if(enemy.hitCount > 2) {   // ~1 hit
+            if(this.Chicken_Group.contains(enemy)) {
+                this.playerScore += 1
+                this.removeGroupChild(this.Chicken_Group, enemy)
+            }
+        }if(enemy.hitCount > 29) {   // ~2 hits
+            if(this.Shrimp_Group.contains(enemy)) {
+                this.playerScore += 6
+                this.removeGroupChild(this.Shrimp_Group, enemy)
+            }else if(this.Comet_Group.contains(enemy)) {
+                this.playerScore += 6
+                this.removeGroupChild(this.Comet_Group, enemy)
+            }
+        }if(enemy.hitCount > 59) {   // ~4 hits
+            if(this.Ghost_Group.contains(enemy)) {
+                this.playerScore += 20
+                this.removeGroupChild(this.Ghost_Group, enemy)
+            }
+        }if(enemy.hitCount > 750) {   // ~50 hits
+            if(this.GigaDuck_Group.contains(enemy)) {
+                this.movingPlatform_2.setVisible(true)
+                this.playerScore += 150
+                this.removeGroupChild(this.GigaDuck_Group, enemy)
+            }
+        }
+        this.damagedAnim(enemy)
     }
     spawnChicken() {
         if(this.randomizer == 0) {
@@ -304,6 +384,9 @@ export default class GameSceneLevel1 extends Phaser.Scene
                     stepX: Phaser.Math.Between(5, 10),
                     stepY: 40
                 }
+            })
+            rightChicken.forEach((chicken)=>{
+                chicken.setFlipX(true)
             })
             this.tweenAnim_Handler(rightChicken, -150, this, 8000, 'linear', false, false)
         } else {
@@ -321,18 +404,18 @@ export default class GameSceneLevel1 extends Phaser.Scene
         }
         this.Chicken_Group.children.iterate((chicken)=>{
             chicken.play('chickenAnim', true)
-            .disableBody(false)
+            chicken.body.allowGravity = false
         })
     }
     chickenBounds() {
         this.Chicken_Group.children.iterate((chicken)=>{
-            if(chicken && (chicken.x <= -100 || chicken.x > this.tileMap.widthInPixels+100)) {
+            if(chicken && (chicken.x <= -100 || chicken.x > this.tileMap.widthInPixels+100 || chicken.y <= 0 && chicken.y > this.tileMap.heightInPixels + 5)) {
                 console.log('CHICKEN REMOVED!')
                 this.removeGroupChild(this.Chicken_Group, chicken)
             }
         })
     }
-
+        // POWER UP
     powerUp_Handler(player, powerUp) {
         if(this.keyE.isDown) {
             if(powerUp == this.trident) {
@@ -343,6 +426,13 @@ export default class GameSceneLevel1 extends Phaser.Scene
         }
     }
 
+        // TILES HANDLER
+    coin_Handler(player, coin) {
+        if (coin.index == 711) {
+            this.playerScore += 2
+            this.coinTiles.removeTileAt(coin.x, coin.y)
+        }
+    }
     tilesBreak_Handler(player, tile) {
         const sandstoneRocks = [ 1290, 1291, 1292, 1293,
                                 1354, 1355, 1356, 1357,
@@ -371,8 +461,8 @@ export default class GameSceneLevel1 extends Phaser.Scene
             }
         }
     }
-    
     interactableTiles_Handler(player, tile) {
+        const chestIndex = [1413,1414]
         // question mark
         if (tile.index == 583) {
             if(tile.x == 20 && tile.y == 8) {
@@ -396,7 +486,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
                 this.time.delayedCall(15000, ()=>{ this.interactableTiles.removeTileAt(tile.x, tile.y) })
             }
         }
-        // platform control panel
+        // platform control panel handler
         if(tile.index == 1411 || tile.index == 1475) {
             this.movingPlatformGroup.children.iterate((platform)=>{
                 if(this.keyE.isDown && this.enableMovingPlatform_1) {
@@ -416,7 +506,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
                 }
             })
         }
-        // barrel platform
+        // barrel platform handler
         if(tile.index == 1478) {
             if(Phaser.Input.Keyboard.JustDown(this.keyE)) {
                 if(this.barrelCollected >= 1) {
@@ -431,8 +521,26 @@ export default class GameSceneLevel1 extends Phaser.Scene
                 }
             }
         }
+        // chest handler
+        if(chestIndex.includes(tile.index)) {
+            if(this.keyE.isDown) {
+                this.playerScore += 50
+                this.interactableTiles.removeTileAt(tile.x, tile.y)
+                this.interactableTiles.removeTileAt(tile.x+1, tile.y)
+            }
+        }
+        // Heal tile handler
+        if(tile.index == 712) {
+            if(this.playerHP < 90) {
+                this.playerHP += 10
+                this.interactableTiles.removeTileAt(tile.x, tile.y)
+            } else if (this.playerHP > 90) { 
+                this.playerHP =  100
+                this.interactableTiles.removeTileAt(tile.x, tile.y) 
+            }
+        }
+        
     }
-
     questionMarkText_Handler() {
         this.breakInfo = this.add.text(20*16, 70, `BREAK THE TILES!\nPress 'Spacebar' to attack\nPress 'E' to collect barrels`, {
             fontSize: '20px', 
@@ -459,7 +567,6 @@ export default class GameSceneLevel1 extends Phaser.Scene
             align: 'center'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5).setVisible(false)
     }
-    
     movingPlatformGroup_Handler(player, platform) {
         // platform.setVelocityX(0)
         if(this.keyE.isDown && this.enableMovingPlatform_1) {
@@ -479,7 +586,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         }
     }
 
-    // barrel
+        // BARREL HANDLER
     createBarrel(x, y) {
         this.barrelGroup.create(x, y, 'barrel')
         this.barrelGroup.children.iterate((barrel)=>{
@@ -497,6 +604,31 @@ export default class GameSceneLevel1 extends Phaser.Scene
         }
     }
 
+        // PORTAL
+    portalAnim() {
+        this.portalAnimCreator(1000, 5)
+        this.portalAnimCreator(1500, 3)
+        this.portalAnimCreator(2500, 7)
+    }
+    portalAnimCreator(delay, barrelVal) {
+        this.time.addEvent({
+            delay: delay,
+            loop: true,
+            callback: ()=>{
+                this.portal.preFX.clear()
+                this.portal.preFX.addGlow(0xff0000, 1)
+                this.portal.preFX.addBarrel(barrelVal)
+            }
+        })
+    }
+    
+        // MISC
+    damagedAnim(target) {
+        target.setTint(0xff5e4f)
+        this.time.delayedCall(250,()=>{
+            target.clearTint()
+        })
+    }
     removeGroupChild(group, child) {
         group.remove(child, true, true)
         child.destroy()
@@ -534,23 +666,4 @@ export default class GameSceneLevel1 extends Phaser.Scene
         tween.play()
         return tween
     }
-    
-    // portal animation
-    portalAnim() {
-        this.portalAnimCreator(1000, 5)
-        this.portalAnimCreator(1500, 3)
-        this.portalAnimCreator(2500, 7)
-    }
-    portalAnimCreator(delay, barrelVal) {
-        this.time.addEvent({
-            delay: delay,
-            loop: true,
-            callback: ()=>{
-                this.portal.preFX.clear()
-                this.portal.preFX.addGlow(0xff0000, 1)
-                this.portal.preFX.addBarrel(barrelVal)
-            }
-        })
-    }
-    
 }
