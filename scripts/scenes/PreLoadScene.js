@@ -59,7 +59,7 @@ export default class PreLoadScene extends Phaser.Scene
 
     create() {
         // 🎥 LOADING VIDEO 🎶
-        // this.add.video(this.screenCenterX, this.screenCenterY, 'loadingVid').play(true).setScale(.55, .55).setPlaybackRate(3)
+        this.add.video(this.screenCenterX, this.screenCenterY, 'loadingVid').play(true).setScale(.55, .55).setPlaybackRate(3)
 
         // 🦈 PLAYER ANIMATION 🦈
         this.createAnim('guraNormalIdle', 'guraNormalIdleAnim', 0, 2, 6)
