@@ -103,7 +103,8 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.invisibleTiles = this.tileMap.createLayer('invisibleTiles', this.tileSet).setCollisionByExclusion([-1]).setVisible(false)
 
         // PORTAL
-        this.portal = this.add.image(124*16, 4*16, 'portal')
+        this.portal = this.physics.add.image(124*16, 4*16, 'portal')
+        this.portal.body.allowGravity = false
         this.portalAnim()
 
         // 🫧 PLAYER 🫧
@@ -186,7 +187,6 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.movingPlatform_2 = this.movingPlatformGroup.create(1960, 700, 'movingPlatform').setVisible(false)
         this.movingPlatform_3 = this.movingPlatformGroup.create(1690, 500, 'movingPlatform').setScale(.5)
         this.movingPlatform_4 = this.movingPlatformGroup.create(113*16, 14*16, 'movingPlatform')
-        
 
             // moving platform animation
         this.tweenAnim_Handler(this.movingPlatform_2, 1960, 455, 2500)
@@ -203,6 +203,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.physics.add.collider(this.player, this.terrainTiles)
         this.physics.add.collider(this.player, this.breakableTiles)
         this.physics.add.collider(this.player, this.invisibleTiles)
+        this.physics.add.collider(this.player, this.portal, this.portal_Handler, null, this)
             //power-ups
         this.physics.add.collider(this.trident, this.breakableTiles)
         this.physics.add.collider(this.trident, this.terrainTiles)
@@ -259,6 +260,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.cameras.main.startFollow(this.player, true)
         this.playerControls()
         this.playerBounds()
+        this.playerHP_Handler()
         this.chickenBounds()
         this.data.set('playerHP', this.playerHP)
         this.data.set('playerScore', this.playerScore)
@@ -321,8 +323,48 @@ export default class GameSceneLevel1 extends Phaser.Scene
     }
     playerBounds() {
         if (this.player.y >= 900) {
+            this.playerHP_Handler()
             this.player.enableBody(true, 33, 100, true, true)
         }
+    }
+    playerHP_Handler() {
+        if (this.playerHP <= 0) {
+            this.playerDeathAnim()
+            this.time.delayedCall(500, ()=>{
+                this.scene.start('GameOverScene')
+            })
+        } else {
+            // CHECK POINTS
+            // if (this.player.x >= 2670) {
+            //     this.player.enableBody(true, 2826, 230, true, true)
+            // }
+            // else if (this.player.x >= 1900 && this.player.x < 2670) {
+            //     this.player.enableBody(true, 2045, 315, true, true)
+            // }
+            // else if (this.player.x < 1900  && this.player.x >= 580) {
+            //     this.player.enableBody(true, 581, 150, true, true)
+            // } else {
+            //     this.player.enableBody(true, 50, 360, true, true)
+            // }
+            
+        }
+    }
+    playerDeathAnim() {
+        this.playerWarpAnimation()
+        this.time.delayedCall(300, ()=>{
+            this.playerHP_Handler()
+        })
+    }
+    playerWarpAnimation() {
+        this.physics.pause()
+        this.player.preFX.addCircle(1)
+        this.player.preFX.addGlow(0x00f2ff, 2)
+        this.time.delayedCall(150, ()=>{
+            this.player.preFX.addBarrel(4)
+        })
+        this.time.delayedCall(200, ()=>{
+            this.player.disableBody(true,true)
+        })
     }
 
         // ENEMIES
@@ -535,12 +577,11 @@ export default class GameSceneLevel1 extends Phaser.Scene
             if(this.playerHP < 90) {
                 this.playerHP += 10
                 this.interactableTiles.removeTileAt(tile.x, tile.y)
-            } else if (this.playerHP > 90) { 
+            } else if (this.playerHP >= 90) { 
                 this.playerHP =  100
                 this.interactableTiles.removeTileAt(tile.x, tile.y) 
             }
         }
-        
     }
     questionMarkText_Handler() {
         this.breakInfo = this.add.text(20*16, 70, `BREAK THE TILES!\nPress 'Spacebar' to attack\nPress 'E' to collect barrels`, {
@@ -620,6 +661,12 @@ export default class GameSceneLevel1 extends Phaser.Scene
                 this.portal.preFX.addGlow(0xff0000, 1)
                 this.portal.preFX.addBarrel(barrelVal)
             }
+        })
+    }
+    portal_Handler(player, portal) {
+        this.playerWarpAnimation()
+        this.time.delayedCall(500,()=>{
+            this.scene.start('GameVictoryScene')
         })
     }
     

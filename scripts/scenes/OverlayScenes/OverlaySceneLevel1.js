@@ -23,6 +23,7 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
         // INIT
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
+        this.timeCounter = 0
 
         // AUDIO
 
@@ -69,8 +70,9 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
             delay: 1000,
             loop: true,
             callback: () => {
-                const currentTimeInSeconds = Math.floor(this.time.now / 1000);
-                timeText.setText(`Time survived: ${currentTimeInSeconds} `);
+                this.timeCounter++
+                // const currentTimeInSeconds = Math.floor(this.time.now / 1000);
+                timeText.setText(`Time survived: ${this.timeCounter} `);
             }
         })
 
@@ -82,6 +84,19 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
             }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
         }
         
+        this.restartBtn = this.add.sprite(this.screenCenterX*1.7, this.screenCenterY*.1, 'button').setOrigin(.5).setInteractive().setScale(2)
+        this.mainMenuBtn = this.add.sprite(this.screenCenterX*1.9, this.screenCenterY*.1, 'button').setOrigin(.5).setInteractive().setScale(2)
+        
+        const restartText = this.textCreate(this.screenCenterX*1.7, this.screenCenterY*.08, 'RESTART ', true, 16)
+        const mainMenuText = this.textCreate(this.screenCenterX*1.9, this.screenCenterY*.08, 'MAIN MENU ', true, 16)
+
+        this.buttonInteract(this.restartBtn,{
+            text: 'restart',
+        })
+        this.buttonInteract(this.mainMenuBtn,{
+            text: 'mainMenu'
+        })
+
         // INTRO TEXT
         // const introText = this.add.text(-1000, screenCenterY*.4,
         //     "T H E  H U N T  S T A R T S  N O W 😶‍🌫️",
@@ -113,6 +128,7 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
         this.updateOverlay(this.GameScene)
     }
 
+    // ========================================================= 🌀 FUNCTIONS 🌀 =========================================================
     updateOverlay(scene) {
         let playerHp = this.scene.get(scene).data.get('playerHP')
         
@@ -132,5 +148,41 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
         this.playerHPText.setText(`Player HP: ${playerHp} `)
         this.scoreText.setText(`Score: ${this.scene.get(scene).data.get('playerScore')} `)
         if(this.fps_Enabled) { this.fps.setText(`FPS: ${Math.floor(this.game.loop.actualFps)} `) }
+    }
+    textCreate(x, y, textDisplay, visible='false', fontSize='20px') {
+        return this.add.text(x, y, textDisplay ,{ 
+            fill: '#ffd059' , fontSize: fontSize, fontStyle: 'italic' , fontFamily: 'stackedPixel'
+        }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5).setVisible(visible)
+    }
+    buttonInteract(button, config) {
+        const buttons = [this.restartBtn, this.mainMenuBtn]
+        button.on("pointerover", ()=>{
+            button.setTint(0xffb0ab)
+            button.preFX.addShine(1.5)
+        })
+        button.on("pointerout", ()=>{
+            button.clearTint()
+            button.preFX.clear()
+            buttons.forEach((index)=>{
+                if(button != index) {
+                    index.clearFX()
+                }
+            })
+        })
+        button.on("pointerdown", ()=>{
+            config.text
+        })
+        button.on("pointerup", ()=>{
+            button.anims.play('button_KeyAnim', true)
+            if(config.text == 'restart') {
+                this.time.delayedCall(200, () => {
+                    this.scene.start(this.GameScene)
+                })
+            }if(config.text == 'mainMenu') {
+                this.time.delayedCall(200, () => {
+                    this.scene.start("MainMenuScene")
+                })
+            }
+        })
     }
 }

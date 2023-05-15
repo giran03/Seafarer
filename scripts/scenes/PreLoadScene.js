@@ -2,9 +2,16 @@ export default class PreLoadScene extends Phaser.Scene
 {
     constructor() { 
         super('PreLoadScene')
-        this.sceneStart = 'GameSceneLevel1' // ⚠️⚠️⚠️⚠️ change this to skip to your assigned game level ⚠️⚠️⚠️⚠️ 
+        this.sceneStart = 'MainMenuScene' // ⚠️⚠️⚠️⚠️ change this to skip to your assigned game level ⚠️⚠️⚠️⚠️ 
+
+        // MISC
+        this.screenCenterX
+        this.screenCenterY
     }
     preload() {
+        this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
+        this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
+        
         // T I L E  M A P S
             // atlas
         this.load.image('atlas', './assets/maps/atlas/atlas.png')
@@ -27,15 +34,33 @@ export default class PreLoadScene extends Phaser.Scene
 
         // FONTS
         this.loadFont("stackedPixel", "./assets/fonts/stackedPixel.ttf")
-
+        
+        // GUI
+        this.load.spritesheet('spaceKey', './assets/gui/space.png', { frameWidth: 67, frameHeight: 16 })
+        this.load.spritesheet('letterKeys', './assets/gui/letter_keys.png', { frameWidth: 17, frameHeight: 16 })
+        this.load.spritesheet('button', './assets/gui/button.png', { frameWidth: 48, frameHeight: 16 })
+        
         // M I S C
+        this.load.spritesheet('guraDance', './assets/misc/gura_aqua.png', {frameWidth: 120, frameHeight: 148})
+        this.load.image('textLogo', './assets/misc/seafarer_textLogo.png')
         this.load.image('portal', './assets/misc/portal.png')
         this.load.image('movingPlatform', './assets/misc/movingPlatform.png')
         this.load.image('barrel', './assets/misc/barrel.png')
         this.load.image('trident', './assets/misc/trident.png')
+
+        // BACKGROUND
+        this.load.video('loadingVid', './assets/backgrounds/guraLoad.mp4')
+        this.load.video('backgroundDefault', './assets/backgrounds/mainMenu.mp4')
+        this.load.video('gameOverBG', './assets/backgrounds/gameOver_bg.mp4')
+
+        // LOADING PROGRESS
+        this.load.on("progress", (percent)=> { console.log("loading: "+ percent) })
     }
 
     create() {
+        // 🎥 LOADING VIDEO 🎶
+        // this.add.video(this.screenCenterX, this.screenCenterY, 'loadingVid').play(true).setScale(.55, .55).setPlaybackRate(3)
+
         // 🦈 PLAYER ANIMATION 🦈
         this.createAnim('guraNormalIdle', 'guraNormalIdleAnim', 0, 2, 6)
         this.createAnim('guraNormalRun', 'guraNormalRunAnim', 0, 5, 8)
@@ -48,17 +73,30 @@ export default class PreLoadScene extends Phaser.Scene
         this.createAnim('chicken', 'chickenAnim', 0, 2, 6)
         this.createAnim('ghost', 'ghostAnim', 0, 3, 6)
         this.createAnim('gigaDuck', 'gigaDuckAnim', 0, 7, 12)
+        // KEYBOARD KEYS ANIMATION
+        this.createAnim('letterKeys', 'W_KeyAnim', 0, 1, 5)
+        this.createAnim('letterKeys', 'A_KeyAnim', 2, 3, 5)
+        this.createAnim('letterKeys', 'D_KeyAnim', 6, 7, 5)
+        this.createAnim('letterKeys', 'E_KeyAnim', 8, 9, 5)
+        this.createAnim('letterKeys', 'O_KeyAnim', 10, 11, 5)
+        this.createAnim('letterKeys', 'P_KeyAnim', 12, 13, 5)
+        this.createAnim('spaceKey', 'space_KeyAnim', 0, 1, 5)
+        this.createAnim('button', 'button_KeyAnim', 0, 1, 16, 0)
+        // MISC
+        this.createAnim('guraDance', 'guraDanceAnim', 0, 54, 24)
 
-        this.scene.start(this.sceneStart)
+        this.time.delayedCall(1000,()=>{
+            this.scene.start(this.sceneStart)
+        })
     }
 
     // Create animation
-    createAnim(key, animKey, start, end, frameRate) {
+    createAnim(key, animKey, start, end, frameRate, repeat = -1) {
         this.anims.create({
             key: animKey,
             frames: this.anims.generateFrameNumbers(key, { start: start, end: end }),
             frameRate: frameRate,
-            repeat: -1
+            repeat: repeat
         })
     }
     
