@@ -17,6 +17,7 @@ export default class PreLoadScene extends Phaser.Scene
         this.load.image('atlas', './assets/maps/atlas/atlas.png')
             // level 1
         this.load.tilemapTiledJSON('level_1_Tilemap', './assets/maps/level_1/level_1.json')
+        this.load.tilemapTiledJSON('level_1_5_Tilemap', './assets/maps/level_1.5/level_1.5.json')
         this.load.tilemapTiledJSON('level_2_Tilemap', './assets/maps/level_2/level_2.json')
         this.load.tilemapTiledJSON('level_3_Tilemap', './assets/maps/level_3/level_3.json')
 
@@ -87,6 +88,12 @@ export default class PreLoadScene extends Phaser.Scene
         this.load.image('lvl1_3', './assets/backgrounds/Level_1/3.png')
         this.load.image('lvl1_4', './assets/backgrounds/Level_1/4.png')
         this.load.image('lvl1_5', './assets/backgrounds/Level_1/5.png')
+            // LEVEL 1.5
+        this.load.image('lvl1_5_1', './assets/backgrounds/Level_1_5/1.png')
+        this.load.image('lvl1_5_2', './assets/backgrounds/Level_1_5/2.png')
+        this.load.image('lvl1_5_3', './assets/backgrounds/Level_1_5/3.png')
+        this.load.image('lvl1_5_4', './assets/backgrounds/Level_1_5/4.png')
+        this.load.image('lvl1_5_5', './assets/backgrounds/Level_1_5/5.png')
             // LEVEL 2
         this.load.image('lvl3_1', './assets/backgrounds/Level_3/1.png')
         this.load.image('lvl3_2', './assets/backgrounds/Level_3/2.png')

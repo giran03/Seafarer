@@ -8,34 +8,44 @@ export default class GameOverScene extends Phaser.Scene
     create() {
         console.log('⚠️ GAME OVER SCENE!!!')
         this.scene.stop('OverlaySceneLevel1')
+        this.scene.stop('OverlaySceneLevel1_5')
         this.scene.stop('OverlaySceneLevel2')
         this.scene.stop('OverlaySceneLevel3')
         this.sound.pauseAll()
         const loose_dialogues = ['loose_1', 'loose_2']
         // AUDIO
-        this.sound.play('defeatSFX', {volume: 1})
-        this.sound.play(loose_dialogues[Phaser.Math.Between(0,1)], {volume: 1.7})
+        this.sound.play('defeatSFX', {volume: .3})
+        this.sound.play(loose_dialogues[Phaser.Math.Between(0,1)], {volume: .6})
         // INIT
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
 
         const level1 = this.scene.get('GameSceneLevel1').data.get('playerScore')
+        const level1_5 = this.scene.get('GameSceneLevel1_5').data.get('playerScore')
         const level2 = this.scene.get('GameSceneLevel2').data.get('playerScore')
         const level3 = this.scene.get('GameSceneLevel3').data.get('playerScore')
-
-        if(level1 != null) {
-            this.playerScore = this.scene.get('GameSceneLevel1').data.get('playerScore')
-            this.playerTime = this.scene.get('OverlaySceneLevel1').data.get('playerTime')
-            this.gameScene = 'GameSceneLevel1'
-        } else if (level2!= null) {
-            this.playerScore = this.scene.get('GameSceneLevel2').data.get('playerScore')
-            this.playerTime = this.scene.get('OverlaySceneLevel2').data.get('playerTime')
-            this.gameScene = 'GameSceneLevel2'
-        } else if(level3 != null) {
+        
+        if(level3 != null) {
             this.playerScore = this.scene.get('GameSceneLevel3').data.get('playerScore')
             this.playerTime = this.scene.get('OverlaySceneLevel3').data.get('playerTime')
             this.gameScene = 'GameSceneLevel3'
+        }else if (level2!= null) {
+            this.playerScore = this.scene.get('GameSceneLevel2').data.get('playerScore')
+            this.playerTime = this.scene.get('OverlaySceneLevel2').data.get('playerTime')
+            this.gameScene = 'GameSceneLevel2'
+        }else if (level1_5!= null) {
+            this.playerScore = this.scene.get('GameSceneLevel1_5').data.get('playerScore')
+            this.playerTime = this.scene.get('OverlaySceneLevel1_5').data.get('playerTime')
+            this.gameScene = 'GameSceneLevel1_5'
+        }else if(level1 != null) {
+            this.playerScore = this.scene.get('GameSceneLevel1').data.get('playerScore')
+            this.playerTime = this.scene.get('OverlaySceneLevel1').data.get('playerTime')
+            this.gameScene = 'GameSceneLevel1'
+        } else {
+            this.playerScore = 0
         }
+        
+        
         
         // 🎥 BACKGROUND VIDEO AND LOGO 🎶
         let backgroundVideo = this.add.video(this.screenCenterX, this.screenCenterY, 'gameOverBG').play(true).setScale(2,2.5)

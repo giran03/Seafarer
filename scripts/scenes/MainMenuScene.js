@@ -23,7 +23,7 @@ export default class MainMenuScene extends Phaser.Scene
         // AUDIO
         this.sound.play( 'bgm', {
             loop: true,
-            volume: .7
+            volume: .3
         })
 
         // 🎥 BACKGROUND VIDEO AND LOGO 🎶

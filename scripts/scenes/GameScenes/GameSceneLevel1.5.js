@@ -1,21 +1,16 @@
-export default class GameSceneLevel2 extends Phaser.Scene
+export default class GameSceneLevel1_5 extends Phaser.Scene
 {
-    //******************************************//
-    //              LEVEL 2 MAP                 //
-    //           Created by @Ancient256         //
-    //******************************************//
-
     constructor() 
     { 
-        super('GameSceneLevel2')
+        super('GameSceneLevel1_5')
 
-        this.overlayScene = 'OverlaySceneLevel2'
+        this.overlayScene = 'OverlaySceneLevel1_5'
     }
 
     create() {
-        console.log('⚠️ GAME SCENE LEVEL 2 START ⚠️')
-        this.scene.stop('OverlaySceneLevel1_5')
-        this.scene.stop('GameSceneLevel1_5')
+        console.log('⚠️ GAME SCENE LEVEL 1.5 START ⚠️')
+        this.scene.stop('OverlaySceneLevel1')
+        this.scene.stop('GameSceneLevel1')
         const {width, height} = this.scale
         const spawn_dialogues = ['spawn_1','spawn_2','spawn_3','spawn_4']
         this.enemy_defeat_dialogues = ['kill_1', 'kill_2']
@@ -25,26 +20,25 @@ export default class GameSceneLevel2 extends Phaser.Scene
         this.attackUprade = false
         this.attackRange = 25           //default: 25
         this.playerHP = 100             //default: 100
-        this.playerScore = this.scene.get('GameSceneLevel1_5').data.get('playerScore')    // gets the last score from level 1
-
+        this.playerScore = this.scene.get('GameSceneLevel1').data.get('playerScore')
 
         // get the center of the screen
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
 
         // 🗺️ TILE MAPS, SETS, LAYERS 🗺️
-        this.tileMap = this.make.tilemap({ key: 'level_2_Tilemap', tileHeight: 16, tileWidth: 16})
+        this.tileMap = this.make.tilemap({ key: 'level_1_5_Tilemap', tileHeight: 16, tileWidth: 16})
         this.tileSet = this.tileMap.addTilesetImage('atlasImage', 'atlas')
             // background
         this.backgroundBot = this.tileMap.createLayer('backgroundBot', this.tileSet).setCollisionByExclusion([-1])            
         this.backgroundMid = this.tileMap.createLayer('backgroundMid', this.tileSet).setCollisionByExclusion([-1])            
-        this.backgroundTop = this.tileMap.createLayer('backgroundTop', this.tileSet).setCollisionByExclusion([-1])
+        this.backgroundTop = this.tileMap.createLayer('backgroundTop', this.tileSet).setCollisionByExclusion([-1])    
             // PARALLAX BACKGROUND
-        this.layer_5 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl3_5').setOrigin(.5).setScrollFactor(0)
-        this.layer_4 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl3_4').setOrigin(.5).setScrollFactor(0)
-        this.layer_3 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl3_3').setOrigin(.5).setScrollFactor(0)
-        this.layer_2 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl3_2').setOrigin(.5).setScrollFactor(0)
-        this.layer_1 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl3_1').setOrigin(.5).setScrollFactor(0)
+        this.layer_5 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl1_5_5').setOrigin(.5).setScrollFactor(0)
+        this.layer_4 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl1_5_4').setOrigin(.5).setScrollFactor(0)
+        this.layer_3 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl1_5_3').setOrigin(.5).setScrollFactor(0)
+        this.layer_2 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl1_5_2').setOrigin(.5).setScrollFactor(0)
+        this.layer_1 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl1_5_1').setOrigin(.5).setScrollFactor(0)
             // other maps
         this.terrainTiles = this.tileMap.createLayer('terrain', this.tileSet).setCollisionByExclusion([-1])
         this.coinTiles = this.tileMap.createLayer('coinTiles', this.tileSet).setCollisionByExclusion([-1])
@@ -53,76 +47,72 @@ export default class GameSceneLevel2 extends Phaser.Scene
         this.invisibleTiles = this.tileMap.createLayer('invisibleTiles', this.tileSet).setCollisionByExclusion([-1]).setVisible(false)
 
         // PORTAL
-        this.portal = this.physics.add.image(124*16, 4*16, 'portal')
+        this.portal = this.physics.add.image(765, 709, 'portal')
         this.portal.body.allowGravity = false
         this.portalAnim()
 
         // 🫧 PLAYER 🫧
-        this.player = this.physics.add.sprite(33, 100, 'guraNormalIdle') // default 33, 100
+        this.player = this.physics.add.sprite(40, 101, 'guraNormalIdle') // default 40, 101
         .play('guraNormalIdleAnim', true).setScale(.2)
         this.player.preFX.addGlow(0x8af1ff, 2)
         this.playerAttackGroup = this.physics.add.staticGroup()
         this.sound.play(spawn_dialogues[Phaser.Math.Between(0,3)],{ volume: 2})
 
         // ENEMIES
-            // ENEMIES
             // shrimp
         this.Shrimp_Group = this.physics.add.group()
-        const shrimp_1 = this.Shrimp_Group.create(58 ,191, 'Dark_Shrimp')
-        this.tweenAnim_Handler(shrimp_1, 58*4, this, 3000)
-        const shrimp_2 = this.Shrimp_Group.create(64, 351, 'Dark_Shrimp').setFlipX(false)
-        this.tweenAnim_Handler(shrimp_2, 64*3.8, this, 2500)
-        const shrimp_3 = this.Shrimp_Group.create(625, 559, 'Dark_Shrimp')
-        this.tweenAnim_Handler(shrimp_3, 55*13.5, this, 3500)
+        const shrimp_1 = this.Shrimp_Group.create(704 ,225, 'Dark_Shrimp').setFlipX(true)
+        this.tweenAnim_Handler(shrimp_1, 34*16, this, 3000)
+        const shrimp_2 = this.Shrimp_Group.create(241 ,290, 'Dark_Shrimp')
+        this.tweenAnim_Handler(shrimp_2, 19.5*16, this, 600)
+        const shrimp_3 = this.Shrimp_Group.create(145 ,452, 'Dark_Shrimp')
+        this.tweenAnim_Handler(shrimp_3, 33*16, this, 3500)
+        const shrimp_4 = this.Shrimp_Group.create(1568 ,225, 'Dark_Shrimp')
+        this.tweenAnim_Handler(shrimp_4, 107*16, this, 3500)
         this.Shrimp_Group.children.iterate((shrimp)=>{
             shrimp.play('shrimpAnim', true)
             shrimp.body.allowGravity = false
         })
             // comet
         this.Comet_Group = this.physics.add.group()
-        const comet_1 =  this.Comet_Group.create(31, 591, 'comet')
-        this.tweenAnim_Handler(comet_1, 9*18, this, 3000, 'Back.easeOut')
-        const comet_2 =  this.Comet_Group.create(93, 767, 'comet')
-        this.tweenAnim_Handler(comet_2, 93*2.5, this, 3000, 'Back.easeOut')
-        const comet_3 =  this.Comet_Group.create(1844, 527, 'comet').setFlipX(true)
-        this.tweenAnim_Handler(comet_3, 93*16, this, 3000, 'Back.easeOut')
-        
+        const comet_1 =  this.Comet_Group.create(425,160, 'comet').setFlipX(true)
+        this.tweenAnim_Handler(comet_1, 185, this, 3000, 'Back.easeOut')
+        const comet_2 =  this.Comet_Group.create(752, 223, 'comet')
+        this.tweenAnim_Handler(comet_2, 70*16, this, 5000, 'Back.easeOut')
+        const comet_3 =  this.Comet_Group.create(525, 625, 'comet')
+        this.tweenAnim_Handler(comet_3, 20*16, this, 6000, 'Circ.easeInOut')
+        const comet_4 =  this.Comet_Group.create(1231, 112, 'comet')
+        this.tweenAnim_Handler(comet_4, 90*16, this, 1500, 'Circ.easeInOut')
         this.Comet_Group.children.iterate((comet)=>{
             comet.play('cometAnim', true)
             comet.body.allowGravity = false
         })
-            // chicken
-        this.Chicken_Group = this.physics.add.group()
-        this.time.addEvent({
-            delay: 5000,
-            loop: true,
-            callback: ()=>{
-                this.spawnChicken()
-            }
-        })
             // ghost
         this.Ghost_Group = this.physics.add.group()
-        const ghost_1 =  this.Ghost_Group.create(699, 463, 'ghost')
-        this.tweenAnim_Handler(ghost_1, 99*9.8, this, 3000, 'Power2')
-        const ghost_2 =  this.Ghost_Group.create(622, 367, 'ghost')
-        this.tweenAnim_Handler(ghost_2, 68*13.5, this, 3500, 'Circ.easeInOut')
-       
-        
+        const ghost_1 =  this.Ghost_Group.create(32, 704, 'ghost')
+        this.tweenAnim_Handler(ghost_1, 12*16, this, 3000, 'Power2')
+        const ghost_2 =  this.Ghost_Group.create(592, 385, 'ghost')
+        this.tweenAnim_Handler(ghost_2, 55*16, this, 3000,'Power2')
+        const ghost_3 =  this.Ghost_Group.create(1185, 52, 'ghost').setFlipX(true)
+        this.tweenAnim_Handler(ghost_3, 47*16, this, 2500, 'Circ.easeInOut')
+        const ghost_4 =  this.Ghost_Group.create(1760, 400, 'ghost').setFlipX(true)
+        this.tweenAnim_Handler(ghost_4, 78*16, this, 7000,)
         this.Ghost_Group.children.iterate((ghost)=>{
             ghost.play('ghostAnim', true)
             ghost.body.allowGravity = false
         })
             // gigaduck
         this.GigaDuck_Group = this.physics.add.group()
-        const gigaDuck_1 =  this.GigaDuck_Group.create(1552, 687, 'gigaDuck')
-        this.tweenAnim_Handler(gigaDuck_1, 121.5*16, this, 3000, 'Circ.easeInOut')
+        const gigaDuck_1 =  this.GigaDuck_Group.create(792, 663, 'gigaDuck')
+        this.tweenAnim_Handler(gigaDuck_1, 67*16, this, 3500, 'Circ.easeInOut')
         this.GigaDuck_Group.children.iterate((gigaDuck)=>{
             gigaDuck.play('gigaDuckAnim', true)
             gigaDuck.body.allowGravity = false
+            gigaDuck.setScale(.7)
         })
-        
+
         // POWER-UPS
-        this.trident = this.physics.add.sprite(335, 79, 'trident')
+        this.trident = this.physics.add.sprite(33, 768, 'trident')  
 
         // 📦 COLLISIONS 📦
             // player
@@ -136,20 +126,16 @@ export default class GameSceneLevel2 extends Phaser.Scene
             // player + enemy
         this.physics.add.overlap(this.player, this.Shrimp_Group, this.enemyDamage_Handler, null, this)
         this.physics.add.overlap(this.player, this.Comet_Group, this.enemyDamage_Handler, null, this)
-        this.physics.add.overlap(this.player, this.Chicken_Group, this.enemyDamage_Handler, null, this)
         this.physics.add.overlap(this.player, this.Ghost_Group, this.enemyDamage_Handler, null, this)
         this.physics.add.overlap(this.player, this.GigaDuck_Group, this.enemyDamage_Handler, null, this)
             // misc
-        this.physics.add.collider(this.player, this.movingPlatformGroup, this.movingPlatformGroup_Handler, null, this)
         this.physics.add.overlap(this.player, this.coinTiles, this.coin_Handler, null, this)
         this.physics.add.overlap(this.player, this.trident, this.powerUp_Handler, null, this)
-        this.physics.add.overlap(this.player, this.barrelGroup, this.barrelCollection_Handler, null, this)
         this.physics.add.overlap(this.player, this.interactableTiles, this.interactableTiles_Handler, null, this)
         this.physics.add.overlap(this.playerAttackGroup, this.breakableTiles, this.tilesBreak_Handler, null, this)
         
         this.physics.add.overlap(this.playerAttackGroup, this.Shrimp_Group, this.enemyHP_Handler, null, this)
         this.physics.add.overlap(this.playerAttackGroup, this.Comet_Group, this.enemyHP_Handler, null, this)
-        this.physics.add.overlap(this.playerAttackGroup, this.Chicken_Group, this.enemyHP_Handler, null, this)
         this.physics.add.overlap(this.playerAttackGroup, this.Ghost_Group, this.enemyHP_Handler, null, this)
         this.physics.add.overlap(this.playerAttackGroup, this.GigaDuck_Group, this.enemyHP_Handler, null, this)
 
@@ -166,7 +152,7 @@ export default class GameSceneLevel2 extends Phaser.Scene
         this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
             // quickly get player pos, used for debugging
         this.input.on('pointerdown', ()=> {
-            this.scene.start('GameSceneLevel3')
+            this.scene.start('GameSceneLevel2')
             console.log('Player X: ' + Math.floor(this.player.x) + 
                     '\t\tPlayer Y: ' + Math.floor(this.player.y))
         })
@@ -181,7 +167,6 @@ export default class GameSceneLevel2 extends Phaser.Scene
         this.playerControls()
         this.playerBounds()
         this.playerHP_Handler()
-        this.chickenBounds()
         this.parralax_Handler()
         this.data.set('playerHP', this.playerHP)
         this.data.set('playerScore', this.playerScore)
@@ -214,15 +199,12 @@ export default class GameSceneLevel2 extends Phaser.Scene
         } 
         if (this.controls.left.isDown || this.keyA.isDown) {
             this.player.setVelocityX(-300).setFlipX(true).anims.play('guraNormalRunAnim', true)
-            this.playerEmitter()
         }
         else if (this.controls.right.isDown || this.keyD.isDown) {
             this.player.setVelocityX(300).setFlipX(false).anims.play('guraNormalRunAnim', true)
-            this.playerEmitter()
         }
         if (this.controls.up.isDown && this.player.body.blocked.down || this.keyW.isDown && this.player.body.blocked.down) { 
             this.player.setVelocityY(-580)
-            this.playerEmitter()
         }
         if (Phaser.Input.Keyboard.JustDown(this.controls.space)) {
             this.playerAttack()
@@ -234,8 +216,8 @@ export default class GameSceneLevel2 extends Phaser.Scene
         let attackAnimation_to_play = 'playerAttackAnim'
         let attackSFX_to_play = 'attack_1'
         if(this.attackUprade) {
-            attackAnimation_to_play = 'playerAttackAnim_upgrade'
             attackSFX_to_play = 'attack_2'
+            attackAnimation_to_play = 'playerAttackAnim_upgrade'
             this.attackRange = 40
         }
         if(this.player.flipX) { // this condition is to check whether the player is flipped
@@ -277,33 +259,7 @@ export default class GameSceneLevel2 extends Phaser.Scene
             this.time.delayedCall(500, ()=>{
                 this.scene.start('GameOverScene')
             })
-        } else {
-            // CHECK POINTS
-            // if (this.player.x >= 2670) {
-            //     this.player.enableBody(true, 2826, 230, true, true)
-            // }
-            // else if (this.player.x >= 1900 && this.player.x < 2670) {
-            //     this.player.enableBody(true, 2045, 315, true, true)
-            // }
-            // else if (this.player.x < 1900  && this.player.x >= 580) {
-            //     this.player.enableBody(true, 581, 150, true, true)
-            // } else {
-            //     this.player.enableBody(true, 50, 360, true, true)
-            // }
-            
         }
-    }
-    playerEmitter() {
-        this.player.depth = 10
-        let emitter = this.add.particles(0,0, 'guraNormalRun', {
-            follow: this.player,
-            scale: this.player.scale,
-            lifespan: { min: 10, max: 10 },
-            angle: { min: 180, max: 180 },
-            speed: 75,
-            blendMode: 'SCREEN'
-        })
-        this.time.delayedCall(50, () => { emitter.stop() }, null, this)
     }
     playerDeathAnim() {
         this.playerWarpAnimation()
@@ -332,8 +288,8 @@ export default class GameSceneLevel2 extends Phaser.Scene
                 this.playerHP -= 4
             }if(this.Comet_Group.contains(enemy)) {
                 this.playerHP -= 4
-            }if(this.Chicken_Group.contains(enemy)) {
-                this.playerHP -= 2
+            // }if(this.Chicken_Group.contains(enemy)) {
+            //     this.playerHP -= 2
             }if(this.Ghost_Group.contains(enemy)) {
                 this.playerHP -= 6
             }if(this.GigaDuck_Group.contains(enemy)) {
@@ -344,12 +300,7 @@ export default class GameSceneLevel2 extends Phaser.Scene
     enemyHP_Handler(playerAttack, enemy) {
         enemy.hitCount = enemy.hitCount || 0
         enemy.hitCount++
-        if(enemy.hitCount > 2) {   // ~1 hit
-            if(this.Chicken_Group.contains(enemy)) {
-                this.playerScore += 1
-                this.removeGroupChild(this.Chicken_Group, enemy)
-            }
-        }if(enemy.hitCount > 29) {   // ~2 hits
+        if(enemy.hitCount > 29) {   // ~2 hits
             if(this.Shrimp_Group.contains(enemy)) {
                 this.sound.play(this.enemy_defeat_dialogues[this.randomizer], {volume: 1.3})
                 this.sound.play('enemySFX', {volume: .8})
@@ -378,48 +329,7 @@ export default class GameSceneLevel2 extends Phaser.Scene
         }
         this.damagedAnim(enemy)
     }
-    spawnChicken() {
-        if(this.randomizer == 0) {
-            const rightChicken = this.Chicken_Group.createMultiple({
-                key: 'chicken',
-                repeat: 5,
-                setXY: {
-                    x: this.tileMap.widthInPixels + 20,
-                    y: this.randY,
-                    stepX: Phaser.Math.Between(5, 10),
-                    stepY: 40
-                }
-            })
-            rightChicken.forEach((chicken)=>{
-                chicken.setFlipX(true)
-            })
-            this.tweenAnim_Handler(rightChicken, -150, this, 8000, 'linear', false, false)
-        } else {
-            const leftChicken = this.Chicken_Group.createMultiple({
-                key: 'chicken',
-                repeat: 5,
-                setXY: {
-                    x: -20,
-                    y: this.randY,
-                    stepX: Phaser.Math.Between(5, 10),
-                    stepY: 40
-                }
-            })
-            this.tweenAnim_Handler(leftChicken, this.tileMap.widthInPixels + 150, this, 8000, 'linear', false, false)
-        }
-        this.Chicken_Group.children.iterate((chicken)=>{
-            chicken.play('chickenAnim', true)
-            chicken.body.allowGravity = false
-        })
-    }
-    chickenBounds() {
-        this.Chicken_Group.children.iterate((chicken)=>{
-            if(chicken && (chicken.x <= -100 || chicken.x > this.tileMap.widthInPixels+100 || chicken.y <= 0 && chicken.y > this.tileMap.heightInPixels + 5)) {
-                console.log('CHICKEN REMOVED!')
-                this.removeGroupChild(this.Chicken_Group, chicken)
-            }
-        })
-    }
+    
         // POWER UP
     powerUp_Handler(player, powerUp) {
         if(this.keyE.isDown) {
@@ -434,20 +344,20 @@ export default class GameSceneLevel2 extends Phaser.Scene
 
         // TILES HANDLER
     coin_Handler(player, coin) {
-        if (coin.index == 611) {
+        if (coin.index == 711) {
             this.sound.play('coinSFX', {volume: .4})
             this.playerScore += 2
             this.coinTiles.removeTileAt(coin.x, coin.y)
         }
     }
     tilesBreak_Handler(player, tile) {
-        const sandstoneRocks = [ 549, 550, 612, 613,
-                                614, 615, 676, 677,
-                                678, 679, 740, 741,
-                                742, 743, 804, 805,
-                                806, 807  ]
+        const sandstoneRocks = [ 543, 544, 545, 546,
+                                607, 608, 609, 610,
+                                671, 672, 673, 674,
+                                735, 736, 737, 738,
+                                799, 800, 801, 802]
 
-        if (tile.index == 466) {
+        if (tile.index == 146) {
             tile.hitCount = tile.hitCount || 0;
             tile.hitCount++;
                 // ~15 per hit; ~30 = 2 hits
@@ -471,7 +381,6 @@ export default class GameSceneLevel2 extends Phaser.Scene
     }
     interactableTiles_Handler(player, tile) {
         const chestIndex = [1413,1414]
-
         // chest handler
         if(chestIndex.includes(tile.index)) {
             if(this.keyE.isDown) {
@@ -495,8 +404,7 @@ export default class GameSceneLevel2 extends Phaser.Scene
             }
         }
     }
-   
-       
+
         // PORTAL
     portalAnim() {
         this.portalAnimCreator(1000, 5)
@@ -517,7 +425,7 @@ export default class GameSceneLevel2 extends Phaser.Scene
     portal_Handler(player, portal) {
         this.playerWarpAnimation()
         this.time.delayedCall(500,()=>{
-            this.scene.start('GameSceneLevel3')
+            this.scene.start('GameSceneLevel2')
         })
     }
     

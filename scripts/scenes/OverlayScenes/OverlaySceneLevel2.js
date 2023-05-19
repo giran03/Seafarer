@@ -23,7 +23,7 @@ export default class OverlaySceneLevel2 extends Phaser.Scene
         // INIT
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
-        this.timeCounter = this.scene.get('OverlaySceneLevel1').data.get('playerTime')
+        this.timeCounter = this.scene.get('OverlaySceneLevel1_5').data.get('playerTime')
         
         //UI
         this.playerHPText = this.add.text(this.screenCenterX*.17, this.screenCenterY*.05, 'Player HP: 100', {
@@ -38,13 +38,13 @@ export default class OverlaySceneLevel2 extends Phaser.Scene
             fontFamily: 'stackedPixel'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
 
-        const levelText = this.add.text(this.screenCenterX*.6, this.screenCenterY*.05, 'Level: 2 ', {
+        const levelText = this.add.text(this.screenCenterX*.75, this.screenCenterY*.05, 'Level: 2 [DEEP WATERS]', {
             fontSize: '20px', 
             fill: '#ffe863' , 
             fontFamily: 'stackedPixel'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
 
-        const timeText = this.add.text(this.screenCenterX*.18, this.screenCenterY*.15, `Time Survived: ${this.scene.get('OverlaySceneLevel1').data.get('playerTime')}`, {
+        const timeText = this.add.text(this.screenCenterX*.18, this.screenCenterY*.15, `Time Survived: ${this.scene.get('OverlaySceneLevel1_5').data.get('playerTime')}`, {
             fontSize: '20px', 
             fill: '#ffe863' , 
             fontFamily: 'stackedPixel'
@@ -56,7 +56,6 @@ export default class OverlaySceneLevel2 extends Phaser.Scene
             loop: true,
             callback: () => {
                 this.timeCounter++
-                // const currentTimeInSeconds = Math.floor(this.time.now / 1000);
                 timeText.setText(`Time survived: ${this.timeCounter} `)
                 this.data.set('playerTime', this.timeCounter)
             }

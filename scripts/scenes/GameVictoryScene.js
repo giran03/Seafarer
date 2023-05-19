@@ -15,8 +15,8 @@ export default class GameVictoryScene extends Phaser.Scene
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
 
         // AUDIO
-        this.sound.play('victorySFX', {volume: 1})
-        this.sound.play(win_dialogues[Phaser.Math.Between(0,1)], {volume: 1})
+        this.sound.play('victorySFX', {volume: .3})
+        this.sound.play(win_dialogues[Phaser.Math.Between(0,1)], {volume: .4})
 
         // 🎥 BACKGROUND VIDEO AND LOGO 🎶
         let backgroundVideo = this.add.video(this.screenCenterX, this.screenCenterY, 'gameOverBG').play(true).setScale(2,2.5)

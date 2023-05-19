@@ -36,10 +36,10 @@ export default class CreditScene extends Phaser.Scene
         this.buttonInteract(backBtn)
 
         // DEVELOPER INFORMATION
-        const devTeamText = "Developer Team: \n\n\n"+
+        const devTeamText = "Studio Compass Devs: \n\n\n"+
         "Joshua Emmanuel Cifra \n\n"+
         "Janmark Laurence Perucho \n\n"+
-        "Guillan Fredd T. Parreno \n\n"+
+        "Guillan Fredd Parreno \n\n"+
         "Alejandro Garcia \n"
 
         let devInfo = this.textCreate(1500, this.screenCenterY, devTeamText, true, '25px')

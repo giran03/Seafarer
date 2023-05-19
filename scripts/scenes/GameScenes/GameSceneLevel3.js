@@ -10,8 +10,6 @@ export default class GameSceneLevel3 extends Phaser.Scene
         super('GameSceneLevel3')
 
         this.overlayScene = 'OverlaySceneLevel3'
-        this.attackUprade = false
-        this.barrelCollected = 0
     }
 
     create() {
@@ -24,6 +22,8 @@ export default class GameSceneLevel3 extends Phaser.Scene
         this.loot_dialogues = ['loot_1', 'loot_2']
 
         // set attributes
+        this.attackUprade = false
+        this.barrelCollected = 0
         this.attackRange = 25           //default: 25
         this.playerHP = 100             //default: 100
         this.playerScore = this.scene.get('GameSceneLevel2').data.get('playerScore')    // gets the last score from level 2
@@ -216,7 +216,7 @@ export default class GameSceneLevel3 extends Phaser.Scene
         this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
 
         this.input.on('pointerdown', ()=> {
-            // this.scene.start('GameVictoryScene')
+            this.scene.start('GameVictoryScene')
             console.log('Player X: ' + Math.floor(this.player.x) + 
                     '\t\tPlayer Y: ' + Math.floor(this.player.y))
         })
@@ -481,7 +481,7 @@ export default class GameSceneLevel3 extends Phaser.Scene
         // TILES HANDLER
     coin_Handler(player, coin) {
         if (coin.index == 711) {
-            this.sound.play('coinSFX', {volume: .8})
+            this.sound.play('coinSFX', {volume: .4})
             this.playerScore += 2
             this.coinTiles.removeTileAt(coin.x, coin.y)
         }
@@ -531,8 +531,8 @@ export default class GameSceneLevel3 extends Phaser.Scene
         // chest handler
         if(chestIndex.includes(tile.index)) {
             if(this.keyE.isDown) {
-                this.sound.play(this.loot_dialogues[this.randomizer], {volume: 1.5})
-                this.sound.play('chestSFX', {volume: 1.3})
+                this.sound.play(this.loot_dialogues[this.randomizer], {volume: .7})
+                this.sound.play('chestSFX', {volume: .4})
                 this.playerScore += 25
                 this.interactableTiles.removeTileAt(tile.x-1, tile.y)
                 this.interactableTiles.removeTileAt(tile.x, tile.y)
@@ -591,7 +591,7 @@ export default class GameSceneLevel3 extends Phaser.Scene
     }
     portal_Handler(player, portal) {
         this.playerWarpAnimation()
-        this.time.delayedCall(500,()=>{
+        this.time.delayedCall(250,()=>{
             this.scene.start('GameVictoryScene')
         })
     }

@@ -10,14 +10,15 @@ export default class GameSceneLevel1 extends Phaser.Scene
         super('GameSceneLevel1')
 
         this.overlayScene = 'OverlaySceneLevel1'
-        this.attackUprade = false
-        this.barrelCollected = 0
     }
 
     create() {
         console.log('⚠️ GAME SCENE LEVEL 1 START ⚠️')
+        this.scene.stop('OverlaySceneLevel1_5')
         this.scene.stop('OverlaySceneLevel2')
         this.scene.stop('OverlaySceneLevel3')
+        this.scene.stop('GameSceneLevel1_5')
+        this.scene.stop('GameSceneLevel2')
         this.scene.stop('GameSceneLevel3')
         this.sound.resumeAll()
         this.sound.stopByKey('defeatSFX')
@@ -32,6 +33,8 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.loot_dialogues = ['loot_1', 'loot_2']
 
         // set attributes
+        this.barrelCollected = 0
+        this.attackUprade = false
         this.attackRange = 25           //default: 25
         this.playerHP = 100             //default: 100
         this.playerScore = 0            //default: 0
@@ -205,7 +208,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
             // quickly get player pos, used for debugging
         this.input.on('pointerdown', ()=> {
-            // this.scene.start('GameSceneLevel2')
+            this.scene.start('GameSceneLevel1_5')
             console.log('Player X: ' + Math.floor(this.player.x) + 
                     '\t\tPlayer Y: ' + Math.floor(this.player.y))
         })
@@ -459,7 +462,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // TILES HANDLER
     coin_Handler(player, coin) {
         if (coin.index == 711) {
-            this.sound.play('coinSFX', {volume: .8})
+            this.sound.play('coinSFX', {volume: .4})
             this.playerScore += 2
             this.coinTiles.removeTileAt(coin.x, coin.y)
         }
@@ -557,8 +560,8 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // chest handler
         if(chestIndex.includes(tile.index)) {
             if(this.keyE.isDown) {
-                this.sound.play(this.loot_dialogues[this.randomizer], {volume: 1.5})
-                this.sound.play('chestSFX', {volume: .8})
+                this.sound.play(this.loot_dialogues[this.randomizer], {volume: .7})
+                this.sound.play('chestSFX', {volume: .4})
                 this.playerScore += 50
                 this.interactableTiles.removeTileAt(tile.x-1, tile.y)
                 this.interactableTiles.removeTileAt(tile.x, tile.y)
@@ -659,7 +662,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
     portal_Handler(player, portal) {
         this.playerWarpAnimation()
         this.time.delayedCall(500,()=>{
-            this.scene.start('GameSceneLevel2')
+            this.scene.start('GameSceneLevel1_5')
         })
     }
     
