@@ -15,9 +15,16 @@ export default class MainMenuScene extends Phaser.Scene
 
     create() {
         this.stopScenes()
+        this.sound.stopAll()
         // INIT
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
+
+        // AUDIO
+        this.sound.play( 'bgm', {
+            loop: true,
+            volume: .7
+        })
 
         // 🎥 BACKGROUND VIDEO AND LOGO 🎶
         let backgroundVideo = this.add.video(this.screenCenterX, this.screenCenterY, 'backgroundDefault').play(true)
@@ -30,6 +37,7 @@ export default class MainMenuScene extends Phaser.Scene
         let revealText = this.textCreate(this.screenCenterX*1.95, this.screenCenterY*.105, "👀 \n", true, true, 17)
         let clickCount = 0
         revealButton.on("pointerdown", ()=>{
+            this.sound.play('btnSFX', {volume: .8})
             clickCount++
             if(clickCount == 1) {backgroundVideo.clearFX()}
             if(clickCount == 2) {backgroundVideo.preFX.addBokeh(3); clickCount = 0}
@@ -114,12 +122,10 @@ export default class MainMenuScene extends Phaser.Scene
         this.scene.stop('OverlaySceneLevel1')
         this.scene.stop('OverlaySceneLevel2')
         this.scene.stop('OverlaySceneLevel3')
-        this.scene.stop('OverlaySceneLevel4')
 
         this.scene.stop('GameSceneLevel1')
         this.scene.stop('GameSceneLevel2')
         this.scene.stop('GameSceneLevel3')
-        this.scene.stop('GameSceneLevel4')
 
         this.scene.stop('GameVictoryScene')
         this.scene.stop('GameOverScene')
@@ -190,6 +196,7 @@ export default class MainMenuScene extends Phaser.Scene
             })
         })
         button.on("pointerdown", ()=>{
+            this.sound.play('btnSFX', {volume: .8})
             config.text
         })
         button.on("pointerup", ()=>{
@@ -204,7 +211,7 @@ export default class MainMenuScene extends Phaser.Scene
                 })
             }if(config.text == 'quit') {
                 this.time.delayedCall(200, () => {
-                    alert('Thank you for playing!!!')
+                    alert('Thank you for playing!!! Gawrrr')
                     window.location.reload()
                 })
             }

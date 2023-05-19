@@ -22,6 +22,7 @@ export default class CreditScene extends Phaser.Scene
         let revealText = this.textCreate(this.screenCenterX*1.95, this.screenCenterY*.105, "👀 \n", true, true, 17)
         let clickCount = 0
         revealButton.on("pointerdown", ()=>{
+            this.sound.play('btnSFX', {volume: .8})
             clickCount++
             if(clickCount == 1) {backgroundVideo.clearFX()}
             if(clickCount == 2) {backgroundVideo.preFX.addBokeh(3); clickCount = 0}
@@ -59,6 +60,9 @@ export default class CreditScene extends Phaser.Scene
         button.on("pointerout", ()=>{
             button.clearTint()
             button.preFX.clear()
+        })
+        button.on("pointerdown", ()=>{
+            this.sound.play('btnSFX', {volume: .8})
         })
         button.on("pointerup", ()=>{
             button.anims.play('button_KeyAnim', true)

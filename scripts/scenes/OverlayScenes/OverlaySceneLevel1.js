@@ -25,22 +25,6 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
         this.timeCounter = 0
 
-        // AUDIO
-
-        // MUTE BUTTON
-        // this.muteBtn = this.add.sprite(this.screenCenterX*1.9, this.screenCenterY*.1, 'uiButtonLarge').setOrigin(.5).setInteractive().setScale(2)
-        // .on('pointerdown', () => { this.sound.mute = !this.sound.mute })
-        // this.add.text(screenCenterX*1.9, screenCenterY*.08, "M U T E " ,{ 
-        //     fill: '#000' , fontSize: '17px', fontStyle: 'italic' , fontFamily: 'impact'
-        // }).setOrigin(.5)
-
-        // // RESTART BUTTON
-        // this.restartBtn = this.add.sprite(this.screenCenterX*1.7, this.screenCenterY*.1, 'uiButtonLarge').setOrigin(.5).setInteractive().setScale(2)
-        // .on('pointerdown', () => { this.scene.start(this.GameScene) })
-        // this.add.text(screenCenterX*1.7, screenCenterY*.08, "R E S T A R T " ,{ 
-        //     fill: '#000' , fontSize: '15px', fontStyle: 'italic' , fontFamily: 'impact'
-        // }).setOrigin(.5)
-
         //UI
         this.playerHPText = this.add.text(this.screenCenterX*.17, this.screenCenterY*.05, 'Player HP: 100', {
             fontSize: '20px', 
@@ -65,14 +49,16 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
             fill: '#ffe863' , 
             fontFamily: 'stackedPixel'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
-        // update the text of the timeText object every second
+        
+        // TIME SURVIVE CLOCK
         this.time.addEvent({
             delay: 1000,
             loop: true,
             callback: () => {
                 this.timeCounter++
                 // const currentTimeInSeconds = Math.floor(this.time.now / 1000);
-                timeText.setText(`Time survived: ${this.timeCounter} `);
+                timeText.setText(`Time survived: ${this.timeCounter} `)
+                this.data.set('playerTime', this.timeCounter)
             }
         })
 
@@ -96,31 +82,6 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
         this.buttonInteract(this.mainMenuBtn,{
             text: 'mainMenu'
         })
-
-        // INTRO TEXT
-        // const introText = this.add.text(-1000, screenCenterY*.4,
-        //     "T H E  H U N T  S T A R T S  N O W 😶‍🌫️",
-        //     { 
-        //         fill: '#ffd129' , fontSize: '30px', fontFamily: 'stackedPixel'
-        //     }).setOrigin(.5).setShadow(2, 2, '#000', 5, true, true)
-        // this.tweens.add({
-        //     targets: introText,
-        //     delay: 700,
-        //     x: screenCenterX,
-        //     y: screenCenterY*.4,
-        //     duration: 1000,
-        //     ease: 'Expo.easeInOut'
-        // })
-        // this.time.delayedCall(2500,()=>{
-        //     this.tweens.add({
-        //         targets: introText,
-        //         delay: 700,
-        //         x: 1500,
-        //         y: screenCenterY*.4,
-        //         duration: 1000,
-        //         ease: 'Circ.easeInOut'
-        //     })
-        // })
         
     }
 
@@ -170,6 +131,7 @@ export default class OverlaySceneLevel1 extends Phaser.Scene
             })
         })
         button.on("pointerdown", ()=>{
+            this.sound.play('btnSFX', {volume: .8})
             config.text
         })
         button.on("pointerup", ()=>{

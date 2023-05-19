@@ -7,10 +7,36 @@ export default class GameOverScene extends Phaser.Scene
 
     create() {
         console.log('⚠️ GAME OVER SCENE!!!')
+        this.scene.stop('OverlaySceneLevel1')
+        this.scene.stop('OverlaySceneLevel2')
+        this.scene.stop('OverlaySceneLevel3')
+        this.sound.pauseAll()
+        const loose_dialogues = ['loose_1', 'loose_2']
+        // AUDIO
+        this.sound.play('defeatSFX', {volume: 1})
+        this.sound.play(loose_dialogues[Phaser.Math.Between(0,1)], {volume: 1.7})
         // INIT
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
 
+        const level1 = this.scene.get('GameSceneLevel1').data.get('playerScore')
+        const level2 = this.scene.get('GameSceneLevel2').data.get('playerScore')
+        const level3 = this.scene.get('GameSceneLevel3').data.get('playerScore')
+
+        if(level1 != null) {
+            this.playerScore = this.scene.get('GameSceneLevel1').data.get('playerScore')
+            this.playerTime = this.scene.get('OverlaySceneLevel1').data.get('playerTime')
+            this.gameScene = 'GameSceneLevel1'
+        } else if (level2!= null) {
+            this.playerScore = this.scene.get('GameSceneLevel2').data.get('playerScore')
+            this.playerTime = this.scene.get('OverlaySceneLevel2').data.get('playerTime')
+            this.gameScene = 'GameSceneLevel2'
+        } else if(level3 != null) {
+            this.playerScore = this.scene.get('GameSceneLevel3').data.get('playerScore')
+            this.playerTime = this.scene.get('OverlaySceneLevel3').data.get('playerTime')
+            this.gameScene = 'GameSceneLevel3'
+        }
+        
         // 🎥 BACKGROUND VIDEO AND LOGO 🎶
         let backgroundVideo = this.add.video(this.screenCenterX, this.screenCenterY, 'gameOverBG').play(true).setScale(2,2.5)
         backgroundVideo.preFX.addBokeh(3)
@@ -18,8 +44,12 @@ export default class GameOverScene extends Phaser.Scene
 
         const randText = ['A G A I N ! 🦈\n', 'G A M E  O V E R ! 👾\n', 'Y O U  L O O S E ! 🗿\n', 'T R Y  A G A I N ! 🔱\n', 'O N E  M O R E ! 👑\n']
         this.textCreate(this.screenCenterX, this.screenCenterY*.5, randText[Phaser.Math.Between(0,4)], true, 60)
-        const scoreText = this.textCreate(this.screenCenterX*.62, this.screenCenterY*.8, 'Score: ', true, 25)
-        const timeText = this.textCreate(this.screenCenterX*.7, this.screenCenterY, 'Time Survived: ', true, 25)
+        const scoreText = this.textCreate(-500, this.screenCenterY*.8, `Score: ${this.playerScore} `, true, 25)
+        const timeText = this.textCreate(1500, this.screenCenterY, `Time Survived: ${this.playerTime} `, true, 25)
+        
+        this.tweenAnim_Handler(scoreText, this.screenCenterX*.62, this.screenCenterY*.8, 1300, 'Expo.easeInOut')
+        this.tweenAnim_Handler(timeText, this.screenCenterX*.7, this.screenCenterY, 1000, 'Expo.easeInOut')
+
 
         this.restartBtn = this.add.sprite(this.screenCenterX*.8, this.screenCenterY*1.4, 'button').setOrigin(.5).setInteractive().setScale(3)
         this.mainMenuBtn = this.add.sprite(this.screenCenterX*1.2, this.screenCenterY*1.4, 'button').setOrigin(.5).setInteractive().setScale(3)
@@ -64,6 +94,7 @@ export default class GameOverScene extends Phaser.Scene
             })
         })
         button.on("pointerdown", ()=>{
+            this.sound.play('btnSFX', {volume: .8})
             config.text
         })
         button.on("pointerup", ()=>{

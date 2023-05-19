@@ -7,9 +7,16 @@ export default class GameVictoryScene extends Phaser.Scene
 
     create() {
         console.log('⚠️ GAME VICTORY SCENE!!!')
+        this.scene.stop('OverlaySceneLevel3')
+        this.sound.pauseAll()
+        const win_dialogues = ['win_1', 'win_2']
         // INIT
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
+
+        // AUDIO
+        this.sound.play('victorySFX', {volume: 1})
+        this.sound.play(win_dialogues[Phaser.Math.Between(0,1)], {volume: 1})
 
         // 🎥 BACKGROUND VIDEO AND LOGO 🎶
         let backgroundVideo = this.add.video(this.screenCenterX, this.screenCenterY, 'gameOverBG').play(true).setScale(2,2.5)
@@ -20,8 +27,8 @@ export default class GameVictoryScene extends Phaser.Scene
 
         const randText = ['C O N G R A T S ! 🦈\n', 'Y O U  W O N ! 👾\n', 'W H A T  A  L E G E N D ! 🗿\n', 'E Z P Z ! 🔱\n', 'U  D R O P P E D  T H I S 👑\n']
         this.textCreate(this.screenCenterX, this.screenCenterY*.5, randText[Phaser.Math.Between(0,4)], true, 60)
-        const scoreText = this.textCreate(this.screenCenterX*.62, this.screenCenterY*.8, 'Score: ', true, 25)
-        const timeText = this.textCreate(this.screenCenterX*.7, this.screenCenterY, 'Time Survived: ', true, 25)
+        const scoreText = this.textCreate(this.screenCenterX*.62, this.screenCenterY*.8, `Score: ${this.scene.get('GameSceneLevel3').data.get('playerScore')} `, true, 25)
+        const timeText = this.textCreate(this.screenCenterX*.7, this.screenCenterY, `Time Survived: ${this.scene.get('OverlaySceneLevel3').data.get('playerTime')} `, true, 25)
 
         this.restartBtn = this.add.sprite(this.screenCenterX*.8, this.screenCenterY*1.4, 'button').setOrigin(.5).setInteractive().setScale(3)
         this.mainMenuBtn = this.add.sprite(this.screenCenterX*1.2, this.screenCenterY*1.4, 'button').setOrigin(.5).setInteractive().setScale(3)
@@ -66,6 +73,7 @@ export default class GameVictoryScene extends Phaser.Scene
             })
         })
         button.on("pointerdown", ()=>{
+            this.sound.play('btnSFX', {volume: .8})
             config.text
         })
         button.on("pointerup", ()=>{

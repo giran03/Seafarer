@@ -23,23 +23,8 @@ export default class OverlaySceneLevel2 extends Phaser.Scene
         // INIT
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
-
-        // AUDIO
-
-        // MUTE BUTTON
-        // this.muteBtn = this.add.sprite(this.screenCenterX*1.9, this.screenCenterY*.1, 'uiButtonLarge').setOrigin(.5).setInteractive().setScale(2)
-        // .on('pointerdown', () => { this.sound.mute = !this.sound.mute })
-        // this.add.text(screenCenterX*1.9, screenCenterY*.08, "M U T E " ,{ 
-        //     fill: '#000' , fontSize: '17px', fontStyle: 'italic' , fontFamily: 'impact'
-        // }).setOrigin(.5)
-
-        // // RESTART BUTTON
-        // this.restartBtn = this.add.sprite(this.screenCenterX*1.7, this.screenCenterY*.1, 'uiButtonLarge').setOrigin(.5).setInteractive().setScale(2)
-        // .on('pointerdown', () => { this.scene.start(this.GameScene) })
-        // this.add.text(screenCenterX*1.7, screenCenterY*.08, "R E S T A R T " ,{ 
-        //     fill: '#000' , fontSize: '15px', fontStyle: 'italic' , fontFamily: 'impact'
-        // }).setOrigin(.5)
-
+        this.timeCounter = this.scene.get('OverlaySceneLevel1').data.get('playerTime')
+        
         //UI
         this.playerHPText = this.add.text(this.screenCenterX*.17, this.screenCenterY*.05, 'Player HP: 100', {
             fontSize: '20px', 
@@ -59,18 +44,21 @@ export default class OverlaySceneLevel2 extends Phaser.Scene
             fontFamily: 'stackedPixel'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
 
-        const timeText = this.add.text(this.screenCenterX*.18, this.screenCenterY*.15, 'Time survived: 0', {
+        const timeText = this.add.text(this.screenCenterX*.18, this.screenCenterY*.15, `Time Survived: ${this.scene.get('OverlaySceneLevel1').data.get('playerTime')}`, {
             fontSize: '20px', 
             fill: '#ffe863' , 
             fontFamily: 'stackedPixel'
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
-        // update the text of the timeText object every second
+
+        // TIME SURVIVE CLOCK
         this.time.addEvent({
             delay: 1000,
             loop: true,
             callback: () => {
-                const currentTimeInSeconds = Math.floor(this.time.now / 1000);
-                timeText.setText(`Time survived: ${currentTimeInSeconds}`);
+                this.timeCounter++
+                // const currentTimeInSeconds = Math.floor(this.time.now / 1000);
+                timeText.setText(`Time survived: ${this.timeCounter} `)
+                this.data.set('playerTime', this.timeCounter)
             }
         })
 
@@ -81,6 +69,19 @@ export default class OverlaySceneLevel2 extends Phaser.Scene
                 fontFamily: 'stackedPixel'
             }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5)
         }
+
+        this.restartBtn = this.add.sprite(this.screenCenterX*1.7, this.screenCenterY*.1, 'button').setOrigin(.5).setInteractive().setScale(2)
+        this.mainMenuBtn = this.add.sprite(this.screenCenterX*1.9, this.screenCenterY*.1, 'button').setOrigin(.5).setInteractive().setScale(2)
+        
+        const restartText = this.textCreate(this.screenCenterX*1.7, this.screenCenterY*.08, 'RESTART ', true, 16)
+        const mainMenuText = this.textCreate(this.screenCenterX*1.9, this.screenCenterY*.08, 'MAIN MENU ', true, 16)
+
+        this.buttonInteract(this.restartBtn,{
+            text: 'restart',
+        })
+        this.buttonInteract(this.mainMenuBtn,{
+            text: 'mainMenu'
+        })
     }
 
     update() {
@@ -106,5 +107,43 @@ export default class OverlaySceneLevel2 extends Phaser.Scene
         this.playerHPText.setText(`Player HP: ${playerHp} `)
         this.scoreText.setText(`Score: ${this.scene.get(scene).data.get('playerScore')} `)
         if(this.fps_Enabled) { this.fps.setText(`FPS: ${Math.floor(this.game.loop.actualFps)} `) }
+    }
+    textCreate(x, y, textDisplay, visible='false', fontSize='20px') {
+        return this.add.text(x, y, textDisplay ,{ 
+            fill: '#ffd059' , fontSize: fontSize, fontStyle: 'italic' , fontFamily: 'stackedPixel'
+        }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5).setVisible(visible)
+    }
+    buttonInteract(button, config) {
+        const buttons = [this.restartBtn, this.mainMenuBtn]
+        button.on("pointerover", ()=>{
+            button.setTint(0xffb0ab)
+            button.preFX.addShine(1.5)
+        })
+        button.on("pointerout", ()=>{
+            button.clearTint()
+            button.preFX.clear()
+            buttons.forEach((index)=>{
+                if(button != index) {
+                    index.clearFX()
+                }
+            })
+        })
+        button.on("pointerdown", ()=>{
+            this.sound.play('btnSFX', {volume: .8})
+            config.text
+        })
+        button.on("pointerup", ()=>{
+            button.anims.play('button_KeyAnim', true)
+            if(config.text == 'restart') {
+                this.time.delayedCall(200, () => {
+                    this.scene.start('GameSceneLevel1')
+                    this.scene.stop(this.GameScene)
+                })
+            }if(config.text == 'mainMenu') {
+                this.time.delayedCall(200, () => {
+                    this.scene.start("MainMenuScene")
+                })
+            }
+        })
     }
 }

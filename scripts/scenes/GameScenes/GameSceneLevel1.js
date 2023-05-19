@@ -9,81 +9,33 @@ export default class GameSceneLevel1 extends Phaser.Scene
     { 
         super('GameSceneLevel1')
 
-        // MAPS, TILESET, LAYER
-        this.tileMap
-        this.tileSet
-        this.terrainTiles
-        this.coinTiles
-        this.breakableTiles
-        this.interactableTiles
-        this.invisibleTiles
-            //background
-        this.backgroundTop
-        this.backgroundMid
-        this.backgroundBot
-
-        // PLAYER
-        this.player
-        this.playerAttackGroup
-
-        // player attributes
-        this.attackRange
-        this.playerHP
-        this.playerScore
-
-        // ENEMIES
-        this.Shrimp_Group
-        this.Comet_Group
-        this.Chicken_Group
-        this.Ghost_Group
-        this.GigaDuck_Group
-
-        // CONTROLS
-        this.controls
-        this.keyW
-        this.keyA
-        this.keyD
-        this.keyE
-        this.keyQ
-
-        // MISC
         this.overlayScene = 'OverlaySceneLevel1'
-        this.screenCenterX
-        this.screenCenterY
-        this.randomizer
-        this.randY
-        this.portal
-
-        // POWER UPS
-        this.trident
         this.attackUprade = false
-
-        // BARREL
-        this.barrelGroup
         this.barrelCollected = 0
-
-        // TEXT
-        this.breakInfo
-        this.barrelInfo
-        this.platformInfo
-        this.sandstoneInfo
-
-        // MOVING PLATFORMS
-        this.movingPlatformGroup
-        this.movingPlatform_1
-        this.movingPlatform_2
-        this.movingPlatform_3
-        this.movingPlatform_4
-        this.enableMovingPlatform_1
     }
 
     create() {
         console.log('⚠️ GAME SCENE LEVEL 1 START ⚠️')
+        this.scene.stop('OverlaySceneLevel2')
+        this.scene.stop('OverlaySceneLevel3')
+        this.scene.stop('GameSceneLevel3')
+        this.sound.resumeAll()
+        this.sound.stopByKey('defeatSFX')
+        this.sound.stopByKey('loose_1')
+        this.sound.stopByKey('loose_2')
+        this.sound.stopByKey('victorySFX')
+        this.sound.stopByKey('win_1')
+        this.sound.stopByKey('win_2')
+        const {width, height} = this.scale
+        const spawn_dialogues = ['spawn_1', 'spawn_2', 'spawn_3', 'spawn_4']
+        this.enemy_defeat_dialogues = ['kill_1', 'kill_2']
+        this.loot_dialogues = ['loot_1', 'loot_2']
+
         // set attributes
         this.attackRange = 25           //default: 25
         this.playerHP = 100             //default: 100
         this.playerScore = 0            //default: 0
-
+        
         // get the center of the screen
         this.screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         this.screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2
@@ -91,10 +43,15 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // 🗺️ TILE MAPS, SETS, LAYERS 🗺️
         this.tileMap = this.make.tilemap({ key: 'level_1_Tilemap', tileHeight: 16, tileWidth: 16})
         this.tileSet = this.tileMap.addTilesetImage('atlasImage', 'atlas')
-            // background
+        // BACKGROUND
         this.backgroundBot = this.tileMap.createLayer('backgroundBot', this.tileSet).setCollisionByExclusion([-1])            
         this.backgroundMid = this.tileMap.createLayer('backgroundMid', this.tileSet).setCollisionByExclusion([-1])            
         this.backgroundTop = this.tileMap.createLayer('backgroundTop', this.tileSet).setCollisionByExclusion([-1])    
+            // PARALLAX BACKGROUND
+            this.layer_2 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl1_2').setOrigin(.5).setScrollFactor(0)
+            this.layer_3 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl1_3').setOrigin(.5).setScrollFactor(0)
+            this.layer_4 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl1_4').setOrigin(.5).setScrollFactor(0)
+            this.layer_5 = this.add.tileSprite(this.screenCenterX, this.screenCenterY, width, height, 'lvl1_5').setOrigin(.5).setScrollFactor(0)
             // other maps
         this.terrainTiles = this.tileMap.createLayer('terrain', this.tileSet).setCollisionByExclusion([-1])
         this.coinTiles = this.tileMap.createLayer('coinTiles', this.tileSet).setCollisionByExclusion([-1])
@@ -112,6 +69,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         .play('guraNormalIdleAnim', true).setScale(.2)
         this.player.preFX.addGlow(0x8af1ff, 2)
         this.playerAttackGroup = this.physics.add.staticGroup()
+        this.sound.play(spawn_dialogues[Phaser.Math.Between(0,3)],{ volume: 2})
 
         // ENEMIES
             // shrimp
@@ -247,6 +205,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E)
             // quickly get player pos, used for debugging
         this.input.on('pointerdown', ()=> {
+            // this.scene.start('GameSceneLevel2')
             console.log('Player X: ' + Math.floor(this.player.x) + 
                     '\t\tPlayer Y: ' + Math.floor(this.player.y))
         })
@@ -262,6 +221,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         this.playerBounds()
         this.playerHP_Handler()
         this.chickenBounds()
+        this.parralax_Handler()
         this.data.set('playerHP', this.playerHP)
         this.data.set('playerScore', this.playerScore)
         this.randomizer = Phaser.Math.Between(0, 1)
@@ -269,6 +229,20 @@ export default class GameSceneLevel1 extends Phaser.Scene
     }
 
     // ========================================================= 🌀 FUNCTIONS 🌀 =========================================================
+    // BACKGROND
+    parralax_Handler() {
+        if(this.keyD.isDown && !this.player.body.blocked.right) {
+            this.layer_2.tilePositionX += .3
+            this.layer_3.tilePositionX += .8
+            this.layer_4.tilePositionX += 1
+            this.layer_5.tilePositionX += 1.5
+        } else if(this.keyA.isDown && !this.player.body.blocked.left) {
+            this.layer_2.tilePositionX -= .3
+            this.layer_3.tilePositionX -= .8
+            this.layer_4.tilePositionX -= 1
+            this.layer_5.tilePositionX -= 1.5
+        }
+    }
         // PLAYER
     playerControls() {
         // ⌨️ PLAYER CONTROLS ⌨️
@@ -292,8 +266,10 @@ export default class GameSceneLevel1 extends Phaser.Scene
         let playerAttack
         let playerAttack2
         let attackAnimation_to_play = 'playerAttackAnim'
+        let attackSFX_to_play = 'attack_1'
         if(this.attackUprade) {
             attackAnimation_to_play = 'playerAttackAnim_upgrade'
+            attackSFX_to_play = 'attack_2'
             this.attackRange = 40
         }
         if(this.player.flipX) { // this condition is to check whether the player is flipped
@@ -315,6 +291,8 @@ export default class GameSceneLevel1 extends Phaser.Scene
                 if(this.attackUprade) { playerAttack2.setScale(1.3) } 
             }
         }
+
+        this.sound.play(attackSFX_to_play, {volume: .6})
         playerAttack.flipY = Math.random() >= 0.5   // random flip for attack animation 
         setTimeout(()=>{
             playerAttack.destroy()
@@ -390,25 +368,34 @@ export default class GameSceneLevel1 extends Phaser.Scene
         enemy.hitCount++
         if(enemy.hitCount > 2) {   // ~1 hit
             if(this.Chicken_Group.contains(enemy)) {
+                this.sound.play('enemySFX', {volume: .8})
                 this.playerScore += 1
                 this.removeGroupChild(this.Chicken_Group, enemy)
             }
         }if(enemy.hitCount > 29) {   // ~2 hits
             if(this.Shrimp_Group.contains(enemy)) {
+                this.sound.play(this.enemy_defeat_dialogues[this.randomizer], {volume: 1.3})
+                this.sound.play('enemySFX', {volume: .8})
                 this.playerScore += 6
                 this.removeGroupChild(this.Shrimp_Group, enemy)
             }else if(this.Comet_Group.contains(enemy)) {
+                this.sound.play(this.enemy_defeat_dialogues[this.randomizer], {volume: 1.3})
+                this.sound.play('enemySFX', {volume: .8})
                 this.playerScore += 6
                 this.removeGroupChild(this.Comet_Group, enemy)
             }
         }if(enemy.hitCount > 59) {   // ~4 hits
             if(this.Ghost_Group.contains(enemy)) {
+                this.sound.play(this.enemy_defeat_dialogues[this.randomizer], {volume: 1.3})
+                this.sound.play('enemySFX', {volume: .8})
                 this.playerScore += 20
                 this.removeGroupChild(this.Ghost_Group, enemy)
             }
         }if(enemy.hitCount > 750) {   // ~50 hits
             if(this.GigaDuck_Group.contains(enemy)) {
+                this.sound.play(this.enemy_defeat_dialogues[this.randomizer], {volume: 1.3})
                 this.movingPlatform_2.setVisible(true)
+                this.sound.play('enemySFX', {volume: .8})
                 this.playerScore += 150
                 this.removeGroupChild(this.GigaDuck_Group, enemy)
             }
@@ -461,6 +448,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
     powerUp_Handler(player, powerUp) {
         if(this.keyE.isDown) {
             if(powerUp == this.trident) {
+                this.sound.play('healSFX', {volume: 1.3})
                 console.log('TRIDENT COLLECTED')
                 this.attackUprade = true
                 this.trident.destroy()
@@ -471,6 +459,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // TILES HANDLER
     coin_Handler(player, coin) {
         if (coin.index == 711) {
+            this.sound.play('coinSFX', {volume: .8})
             this.playerScore += 2
             this.coinTiles.removeTileAt(coin.x, coin.y)
         }
@@ -487,10 +476,10 @@ export default class GameSceneLevel1 extends Phaser.Scene
             tile.hitCount++;
                 // ~15 per hit; ~30 = 2 hits
             if(this.attackUprade) {
-                if (tile.hitCount >= 15) { this.breakableTiles.removeTileAt(tile.x, tile.y) }
+                if (tile.hitCount >= 15) { this.sound.play('brickSFX', {volume: .2});this.breakableTiles.removeTileAt(tile.x, tile.y) }
             } else {
                 if (tile.hitCount == 15) { tile.tint = 0xb36532 }
-                else if (tile.hitCount == 30) { this.breakableTiles.removeTileAt(tile.x, tile.y) }
+                else if (tile.hitCount == 30) { this.sound.play('brickSFX', {volume: .2});this.breakableTiles.removeTileAt(tile.x, tile.y) }
             }
         }
         if(sandstoneRocks.includes(tile.index) && this.attackUprade) {
@@ -499,6 +488,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
             if (tile.hitCount == 30) { tile.tint = 0xe08e53 }
             if (tile.hitCount == 60) { tile.tint = 0xb36532 }
             else if (tile.hitCount == 90) {
+                this.sound.play('brickSFX', {volume: .2})
                 this.breakableTiles.removeTileAt(tile.x, tile.y)
             }
         }
@@ -551,6 +541,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // barrel platform handler
         if(tile.index == 1478) {
             if(Phaser.Input.Keyboard.JustDown(this.keyE)) {
+                this.sound.play('barrelSFX', {volume: .8})
                 if(this.barrelCollected >= 1) {
                     this.createBarrel(56, 751)
                     if(this.barrelCollected >= 2) {
@@ -566,6 +557,8 @@ export default class GameSceneLevel1 extends Phaser.Scene
         // chest handler
         if(chestIndex.includes(tile.index)) {
             if(this.keyE.isDown) {
+                this.sound.play(this.loot_dialogues[this.randomizer], {volume: 1.5})
+                this.sound.play('chestSFX', {volume: .8})
                 this.playerScore += 50
                 this.interactableTiles.removeTileAt(tile.x-1, tile.y)
                 this.interactableTiles.removeTileAt(tile.x, tile.y)
@@ -574,6 +567,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         }
         // Heal tile handler
         if(tile.index == 712) {
+            this.sound.play('healSFX', {volume: 1.3})
             if(this.playerHP < 90) {
                 this.playerHP += 10
                 this.interactableTiles.removeTileAt(tile.x, tile.y)
@@ -610,9 +604,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         }).setShadow(2, 2, '#000', 5, true, true).setOrigin(.5).setVisible(false)
     }
     movingPlatformGroup_Handler(player, platform) {
-        // platform.setVelocityX(0)
         if(this.keyE.isDown && this.enableMovingPlatform_1) {
-            // this.physics.moveToObject(platform, player, 100)
             if(platform.y <= 170) {
                 platform.body.y += 0
             } else {
@@ -639,6 +631,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
         const spawnBarrelCords = [456,395,776]
         
         if(Phaser.Input.Keyboard.JustDown(this.keyE) && spawnBarrelCords.includes(barrel.x)) {
+            this.sound.play('barrelSFX', {volume: .8})
             this.barrelCollected += 1
             console.log(`BARREL COUNT: ${this.barrelCollected}`)
             this.barrelGroup.remove(barrel, true, true)
@@ -666,7 +659,7 @@ export default class GameSceneLevel1 extends Phaser.Scene
     portal_Handler(player, portal) {
         this.playerWarpAnimation()
         this.time.delayedCall(500,()=>{
-            this.scene.start('GameVictoryScene')
+            this.scene.start('GameSceneLevel2')
         })
     }
     

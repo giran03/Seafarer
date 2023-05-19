@@ -2,7 +2,7 @@ export default class PreLoadScene extends Phaser.Scene
 {
     constructor() { 
         super('PreLoadScene')
-        this.sceneStart = 'MainMenuScene' // ⚠️⚠️⚠️⚠️ change this to skip to your assigned game level ⚠️⚠️⚠️⚠️ 
+        this.sceneStart = 'MainMenuScene' // default: MainMenuScene
 
         // MISC
         this.screenCenterX
@@ -17,6 +17,35 @@ export default class PreLoadScene extends Phaser.Scene
         this.load.image('atlas', './assets/maps/atlas/atlas.png')
             // level 1
         this.load.tilemapTiledJSON('level_1_Tilemap', './assets/maps/level_1/level_1.json')
+        this.load.tilemapTiledJSON('level_2_Tilemap', './assets/maps/level_2/level_2.json')
+        this.load.tilemapTiledJSON('level_3_Tilemap', './assets/maps/level_3/level_3.json')
+
+        // A U D I O
+        this.load.audio('bgm', './assets/audio/bgm.ogg')
+        this.load.audio('btnSFX', './assets/audio/buttonClack.ogg')
+        this.load.audio('healSFX', './assets/audio/heal.ogg')
+        this.load.audio('coinSFX', './assets/audio/coin.ogg')
+        this.load.audio('brickSFX', './assets/audio/brickWall.ogg')
+        this.load.audio('barrelSFX', './assets/audio/barrel.ogg')
+        this.load.audio('chestSFX', './assets/audio/coinLoot.ogg')
+        this.load.audio('enemySFX', './assets/audio/enemyDefeat.ogg')
+        this.load.audio('attack_1', './assets/audio/attackSFX_1.ogg')
+        this.load.audio('attack_2', './assets/audio/attackSFX_2.ogg')
+        this.load.audio('defeatSFX', './assets/audio/defeat.ogg')
+        this.load.audio('victorySFX', './assets/audio/victory.ogg')
+            // dialogues
+        this.load.audio('spawn_1', './assets/audio/dialogues/spawn_1.ogg')
+        this.load.audio('spawn_2', './assets/audio/dialogues/spawn_2.ogg')
+        this.load.audio('spawn_3', './assets/audio/dialogues/spawn_3.ogg')
+        this.load.audio('spawn_4', './assets/audio/dialogues/spawn_4.ogg')
+        this.load.audio('kill_1', './assets/audio/dialogues/kill_1.ogg')
+        this.load.audio('kill_2', './assets/audio/dialogues/kill_2.ogg')
+        this.load.audio('loot_1', './assets/audio/dialogues/loot_1.ogg')
+        this.load.audio('loot_2', './assets/audio/dialogues/loot_2.ogg')
+        this.load.audio('loose_1', './assets/audio/dialogues/loose_1.ogg')
+        this.load.audio('loose_2', './assets/audio/dialogues/loose_2.ogg')
+        this.load.audio('win_1', './assets/audio/dialogues/win_1.ogg')
+        this.load.audio('win_2', './assets/audio/dialogues/win_2.ogg')
 
         // S P R I T E  S H E E T S
             // player
@@ -45,14 +74,33 @@ export default class PreLoadScene extends Phaser.Scene
         this.load.image('textLogo', './assets/misc/seafarer_textLogo.png')
         this.load.image('portal', './assets/misc/portal.png')
         this.load.image('movingPlatform', './assets/misc/movingPlatform.png')
+        this.load.image('movingPlatform_lvl4', './assets/misc/movingPlatform_lvl4.png')
         this.load.image('barrel', './assets/misc/barrel.png')
         this.load.image('trident', './assets/misc/trident.png')
 
-        // BACKGROUND
+        // BACKGROUNDS
         this.load.video('loadingVid', './assets/backgrounds/guraLoad.mp4')
         this.load.video('backgroundDefault', './assets/backgrounds/mainMenu.mp4')
         this.load.video('gameOverBG', './assets/backgrounds/gameOver_bg.mp4')
-
+            // LEVEL 1
+        this.load.image('lvl1_2', './assets/backgrounds/Level_1/2.png')
+        this.load.image('lvl1_3', './assets/backgrounds/Level_1/3.png')
+        this.load.image('lvl1_4', './assets/backgrounds/Level_1/4.png')
+        this.load.image('lvl1_5', './assets/backgrounds/Level_1/5.png')
+            // LEVEL 2
+        this.load.image('lvl3_1', './assets/backgrounds/Level_3/1.png')
+        this.load.image('lvl3_2', './assets/backgrounds/Level_3/2.png')
+        this.load.image('lvl3_3', './assets/backgrounds/Level_3/3.png')
+        this.load.image('lvl3_4', './assets/backgrounds/Level_3/4.png')
+        this.load.image('lvl3_5', './assets/backgrounds/Level_3/5.png')
+            // LEVEL 3
+        this.load.image('lvl4_1', './assets/backgrounds/Level_4/1.png')
+        this.load.image('lvl4_2', './assets/backgrounds/Level_4/2.png')
+        this.load.image('lvl4_3', './assets/backgrounds/Level_4/3.png')
+        this.load.image('lvl4_4', './assets/backgrounds/Level_4/4.png')
+        this.load.image('lvl4_5', './assets/backgrounds/Level_4/5.png')
+        this.load.image('lvl4_6', './assets/backgrounds/Level_4/6.png')
+        this.load.image('lvl4_7', './assets/backgrounds/Level_4/7.png')
         // LOADING PROGRESS
         this.load.on("progress", (percent)=> { console.log("loading: "+ percent) })
     }
