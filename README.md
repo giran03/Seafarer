@@ -1,6 +1,7 @@
 # Seafarer 
 ### Studio Compass
-![Gawr_Gura_Portrait-TITLED](https://github.com/giran03/Seafarer/assets/118046901/78a23c43-4908-4b8b-8630-6e4cb67dbe65)
+![Gawr_Gura_Portrait-TITLED](https://github.com/giran03/Seafarer/assets/118046901/3d1cda4a-0c70-44bf-8b28-a5588541d4ef)
+
 
 
 
@@ -12,13 +13,14 @@ A final project for Game Programming 1
 
 
 ## GAME TRAILER
+https://github.com/giran03/Seafarer/assets/118046901/edc4bbde-b0ce-417b-ac4b-58e502112e1b
 
 
-https://github.com/giran03/Seafarer/assets/118046901/f672c083-7236-4025-8193-fd4602409086
+
+
 
 ## CONTROLS
-
-![image](https://github.com/giran03/Seafarer/assets/118046901/89c311f6-0494-4e51-8d46-04e40b52b496)
+![Screenshot 2023-05-20 001841](https://github.com/giran03/Seafarer/assets/118046901/e9df4afa-6bc6-45f7-9df5-622188648e44)
 
 **W** = Jump
 
