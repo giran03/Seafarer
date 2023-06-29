@@ -212,7 +212,7 @@ export default class MainMenuScene extends Phaser.Scene
             }if(config.text == 'quit') {
                 this.time.delayedCall(200, () => {
                     alert('Thank you for playing!!! Gawrrr')
-                    window.location.reload()
+                    window.location.href = '../../index.html'
                 })
             }
         })
