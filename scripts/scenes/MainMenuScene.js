@@ -130,10 +130,6 @@ export default class MainMenuScene extends Phaser.Scene
         this.scene.stop('GameVictoryScene')
         this.scene.stop('GameOverScene')
     }
-    
-    
-    
-    
     textCreate(x, y, textDisplay, visible='false', controls='false', fontSize='20px') {
         if(controls) {
             return this.add.text(x, y, textDisplay,

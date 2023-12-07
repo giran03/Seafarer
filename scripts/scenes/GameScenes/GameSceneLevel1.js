@@ -314,20 +314,6 @@ export default class GameSceneLevel1 extends Phaser.Scene
             this.time.delayedCall(500, ()=>{
                 this.scene.start('GameOverScene')
             })
-        } else {
-            // CHECK POINTS
-            // if (this.player.x >= 2670) {
-            //     this.player.enableBody(true, 2826, 230, true, true)
-            // }
-            // else if (this.player.x >= 1900 && this.player.x < 2670) {
-            //     this.player.enableBody(true, 2045, 315, true, true)
-            // }
-            // else if (this.player.x < 1900  && this.player.x >= 580) {
-            //     this.player.enableBody(true, 581, 150, true, true)
-            // } else {
-            //     this.player.enableBody(true, 50, 360, true, true)
-            // }
-            
         }
     }
     playerDeathAnim() {
